@@ -1,0 +1,251 @@
+{
+    "projectName": "PhenoDCC Quality Control Web Application",
+    "licenseText": "Copyright (c) 2012 Medical Research Council Harwell",
+    "builds": [
+        {
+            "name": "All Classes",
+            "target": "all-classes.js",
+            "options": {
+                "debug": true
+            },
+            "files": [
+                {
+                    "clsName": "PhenoDCC.proxy.AbortableRest",
+                    "name": "AbortableRest.js",
+                    "path": "app/proxy/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.Action",
+                    "name": "Action.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Actions",
+                    "name": "Actions.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.ActionType",
+                    "name": "ActionType.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.ActionTypes",
+                    "name": "ActionTypes.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.AllIssue",
+                    "name": "AllIssue.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.AllIssues",
+                    "name": "AllIssues.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.Centre",
+                    "name": "Centre.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Centres",
+                    "name": "Centres.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.CitedDataPoint",
+                    "name": "CitedDataPoint.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.CitedDataPoints",
+                    "name": "CitedDataPoints.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.DataContext",
+                    "name": "DataContext.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.DataContexts",
+                    "name": "DataContexts.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.GeneStrain",
+                    "name": "GeneStrain.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.GeneStrains",
+                    "name": "GeneStrains.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.Issue",
+                    "name": "Issue.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Issues",
+                    "name": "Issues.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.IssueStatus",
+                    "name": "IssueStatus.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.IssueStatuses",
+                    "name": "IssueStatuses.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.Measurement",
+                    "name": "Measurement.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Measurements",
+                    "name": "Measurements.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.Parameter",
+                    "name": "Parameter.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Parameters",
+                    "name": "Parameters.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.Pipeline",
+                    "name": "Pipeline.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Pipelines",
+                    "name": "Pipelines.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.Procedure",
+                    "name": "Procedure.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Procedures",
+                    "name": "Procedures.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.ProcedureSpecimen",
+                    "name": "ProcedureSpecimen.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.ProcedureSpecimens",
+                    "name": "ProcedureSpecimens.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.Specimen",
+                    "name": "Specimen.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Specimens",
+                    "name": "Specimens.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.model.User",
+                    "name": "User.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "PhenoDCC.store.Users",
+                    "name": "Users.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.AllIssuesPanel",
+                    "name": "AllIssuesPanel.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.ProcedureSpecimens",
+                    "name": "ProcedureSpecimens.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.IssuesPanel",
+                    "name": "IssuesPanel.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.QcIssues",
+                    "name": "QcIssues.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.DataVisualisation",
+                    "name": "DataVisualisation.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.GeneStrainsTree",
+                    "name": "GeneStrainsTree.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.ProceduresPanel",
+                    "name": "ProceduresPanel.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.ParametersPanel",
+                    "name": "ParametersPanel.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.QualityControl",
+                    "name": "QualityControl.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.view.Viewport",
+                    "name": "Viewport.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "PhenoDCC.controller.QualityControl",
+                    "name": "QualityControl.js",
+                    "path": "app/controller/"
+                }
+            ]
+        },
+        {
+            "name": "Application - Production",
+            "target": "app-all.js",
+            "compress": true,
+            "files": [
+                {
+                    "path": "",
+                    "name": "all-classes.js"
+                },
+                {
+                    "path": "",
+                    "name": "app.js"
+                }
+            ]
+        }
+    ],
+    "resources": []
+}

@@ -1,0 +1,67 @@
+/**
+ *
+ * @author Gagarine Yaikhom <g.yaikhom@har.mrc.ac.uk>
+ */
+$theme-name: 'gray';
+$base-color: #fff;
+
+//panel
+$panel-header-background-color: #fff;
+$panel-border-color: #ccc;
+$panel-header-color: #333;
+$panel-frame-background-color: #fff;
+
+//window
+$window-background-color: #e8e8e8;
+$window-header-color: #333;
+
+//menu
+$menu-item-active-background-color: darken(#f3f3f3, 5);
+$menu-item-active-border-color: #9d9d9d;
+
+//datepicker
+$datepicker-header-background-color: #6f6f6f;
+$datepicker-border-color: #585858;
+$datepicker-th-background-color: #e9e9e9;
+$datepicker-selected-item-background-color: #d8d8d8;
+$datepicker-item-hover-background-color: transparent;
+
+//progress bar
+$progress-border-color: #8e8e8e;
+$progress-background-color: #f1f1f1;
+$progress-bar-background-color: #ababab;
+
+//tips
+$tip-base-color: lighten($base-color, 5);
+
+//grid
+$grid-header-over-border-color: darken($base-color, 3);
+
+//toolbar
+$toolbar-separator-color: #aca899;
+$toolbar-text-color: #000;
+
+//btn group
+$btn-group-background-color: #f0f0f0;
+$btn-group-header-background-color: #dfdfdf;
+$btn-group-border-color: #d0d0d0;
+$btn-group-header-color: #666;
+$btn-group-inner-border-color: #ececec;
+
+//form
+$fieldset-header-color: #333;
+
+$boundlist-border-color: #b5b8c8;
+
+//tabs
+$tab-base-color: #fff;
+$tab-color-active: #333333;
+$tab-height: 30px;
+$tab-spacing: -1px !default;
+
+//tab bar strip
+$tabbar-strip-height: 0px !default;
+
+@import 'compass';
+@import 'ext4/default/all';
+
