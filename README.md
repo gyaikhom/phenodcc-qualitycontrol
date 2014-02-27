@@ -5,7 +5,8 @@ carrying out quality control of phenotype data. It provides an
 interactive user interface through which mouse phenotype data can be
 visualised, analysed and understood. This tool allows a user to raise
 any quality control issues (e.g., data transfer errors) before the
-data is archived at the central data archive hosted at EMBL-EBI.
+data is archived at the central data archive hosted at
+[EMBL-EBI](http://www.ebi.ac.uk/services/teams/impc).
 
 
 ![Screenshot of PhenoDCC QC Tool](qctool.jpg)
