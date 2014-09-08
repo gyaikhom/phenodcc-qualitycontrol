@@ -39,14 +39,14 @@ Ext.define('PhenoDCC.view.Viewport', {
         this.items = {
             dockedItems: [{
                     dock: 'top',
-                    height: 34,
+                    height: 50,
                     layout: 'border',
                     items: [
                         {
                             xtype: 'container',
                             id: 'logo',
                             html: "<img src='resources/images/logo-text.png' title='Version " + dcc.version + "'>",
-                            width: 250,
+                            width: 200,
                             region: 'west'
                         }, {
                             xtype: 'container',

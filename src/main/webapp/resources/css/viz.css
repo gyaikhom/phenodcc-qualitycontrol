@@ -78,6 +78,7 @@ html, body, #app-loading {
 .dataremoved,
 .datachanged,
 .hasissues,
+.redoqc,
 .qcdone {
     width: 25px;
     height: 21px;
@@ -104,8 +105,42 @@ html, body, #app-loading {
     background-image: url('../images/hasissues.png')!important;
 }
 
+.redoqc {
+    background-image: url('../images/redoqc.png')!important;
+}
+
 .qcdone {
     background-image: url('../images/qcdone.png')!important;
+}
+
+.dataadded_hasissues,
+.dataremoved_hasissues,
+.datachanged_hasissues,
+.redoqc_hasissues,
+.qcdone_hasissues {
+    width: 45px;
+    height: 21px;
+    background-repeat: no-repeat;
+}
+
+.dataadded_hasissues {
+    background-image: url('../images/dataadded_hasissues.png')!important;
+}
+
+.dataremoved_hasissues {
+    background-image: url('../images/dataremoved_hasissues.png')!important;
+}
+
+.datachanged_hasissues {
+    background-image: url('../images/datachanged_hasissues.png')!important;
+}
+
+.redoqc_hasissues {
+    background-image: url('../images/redoqc_hasissues.png')!important;
+}
+
+.qcdone_hasissues {
+    background-image: url('../images/qcdone_hasissues.png')!important;
 }
 
 .phenodcc-searchbox {
@@ -150,7 +185,7 @@ html, body, #app-loading {
 
 #phenodcc-gene-details-header {
     color: #555;
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
+    font-family: "Source Sans Pro", Arial, Helvetica, sans-serif;
     font-size: 14px;
     font-weight: 400;
     text-align: left;
@@ -164,7 +199,7 @@ html, body, #app-loading {
     padding: 0;
     margin: 0;
     width: 100%;
-    font-family: "Roboto";
+    font-family: "Source Sans Pro";
     font-size: 13px;
     font-weight: 400;
 }
@@ -223,9 +258,8 @@ html, body, #app-loading {
 }
 
 #logo {
-    margin-top: 4px;
-    padding-top: 3px;
-    padding-left: 10px;
+    padding-top: 18px;
+    padding-left: 20px;
 }
 
 .workinprogress {
@@ -237,15 +271,15 @@ html, body, #app-loading {
 
 .x-grid-cell-inner {
     font-size: 13px;
-    font-family: "Roboto";
+    font-family: "Source Sans Pro";
     font-weight: 400;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .x-grid-row-selected .x-grid-cell,
 .x-grid-row-selected .x-grid-rowwrap-div {
     border: 0;
-    background: rgba(255, 102, 0, 1) !important;
+    background: rgba(9, 120, 161, 1) !important;
     color: white !important;
 }
 
@@ -263,12 +297,12 @@ html, body, #app-loading {
     box-shadow: 0 0 10px rgba(0, 0, 0, .3);
 }
 
-.actions-container {
+#actions-container {
     width: 100%;
     display: inline-block;
     padding: 0px;
     padding-bottom: 20px;
-    font-family: "Roboto";
+    font-family: "Source Sans Pro";
     font-size: 13px;
     font-weight: 400;
 }
@@ -290,7 +324,7 @@ html, body, #app-loading {
     width: 100%;
     margin-top: 30px;
     color: #555;
-    font-family: "Roboto", Arial;
+    font-family: "Source Sans Pro", Arial;
     font-size: 13px;
     font-weight: 400;
     line-height: 1.65;
@@ -372,8 +406,7 @@ html, body, #app-loading {
 
 svg {
     float: left;
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
-    opacity: 1;
+    font-family: "Source Sans Pro", Arial, Helvetica, sans-serif;
 }
 
 /* mouse pointer cross hair */
@@ -384,7 +417,7 @@ svg {
 }
 
 #datapoint-infobox {
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
+    font-family: "Source Sans Pro", Arial, Helvetica, sans-serif;
     font-size: 13px;
     color: #444;
     background-color: rgba(255,255,255,1);
@@ -396,6 +429,7 @@ svg {
     position: fixed;
     padding: 15px;
     margin: 0;
+    z-index: 9999;
 }
 
 #datapoint-infobox hr {
@@ -459,30 +493,22 @@ polyline {
 
 .all-points .series polyline {
     stroke: blue;
-    stroke-opacity: .25;
     stroke-width: 4px;
 }
 
 .all-wildtype-points .series polyline {
     stroke: green;
-    stroke-opacity: .25;
     stroke-width: 4px;
 }
 
 .series.highlighted polyline {
     stroke: red;
-    stroke-opacity: .5;
     stroke-width: 2px;
 }
 
 .highlighted {
     stroke: red;
-    stroke-opacity: 1;
     stroke-width: 4px;
-}
-
-.stat .series polyline {
-    stroke-opacity: .6;
 }
 
 .wildtype-mean,
@@ -544,14 +570,13 @@ circle {
     stroke-width: 6px;
 }
 
-.legend-highlighted,
-.series.highlighted circle {
-    stroke: red;
-    fill: red;
+.legend-newdata,
+.series.newdata circle {
+    stroke: black;
+    fill: black;
     stroke-width: 2px;
-    fill-opacity: 1;
-    stroke-opacity: 1;
 }
+
 
 .all-points .series .to-select,
 .series.highlighted .to-select
@@ -559,11 +584,6 @@ circle {
     fill: yellow;
     stroke-width: 3px;
     stroke: black;
-}
-
-.highlight-selection circle {
-    fill: orange;
-    stroke: orangered;
 }
 
 .all-points .series .to-remove,
@@ -581,8 +601,6 @@ circle {
 
 .stat .series circle {
     stroke-dasharray: none;
-    fill-opacity: .75;
-    stroke-opacity: .4;
 }
 
 .wildtype-mean circle,
@@ -621,40 +639,6 @@ circle {
     fill: #FF33CC;
 }
 
-.male circle, circle.male
-{
-    stroke-width: 1.5px;
-    stroke: #008ae5;
-    fill: #0099ff;
-    stroke-opacity: .6;
-    fill-opacity: .4;
-}
-
-.male rect, rect.male
-{
-    stroke-width: 1px;
-    stroke: #13bf00;
-    fill: #51bf43;
-    fill-opacity: .6;
-}
-
-.female circle, circle.female {
-    stroke-width: 1.5px;
-    stroke: #e55c00;
-    fill: #ff6600;
-    stroke-opacity: .6;
-    fill-opacity: .4;
-
-}
-
-.female rect, rect.female {
-    stroke-width: 1px;
-    stroke: #b800cc;
-    fill: #da00f2;
-    stroke-opacity: .3;
-    fill-opacity: .3;
-}
-
 .all-wildtype-points .series rect {
 }
 
@@ -665,8 +649,8 @@ circle {
 
 /* lines */
 .mean line {
-    stroke: #F53D00;
-    fill: #F53D00;
+    stroke: green;
+    fill: green;
 }
 
 .median line {
@@ -731,20 +715,6 @@ circle {
     font-size: 10pt;
 }
 
-.all-points .series .selected,
-.series.highlighted .selected {
-    fill: orangered;
-    stroke: red;
-    stroke-opacity: 1;
-    stroke-width: 1px;
-    fill-opacity: .85;
-}
-
-.all-points .series .selected:hover,
-.series.highlighted .selected:hover {
-    stroke: red;
-}
-
 .hide-pointer {
     cursor: none;
 }
@@ -766,20 +736,6 @@ circle {
 .x-axis, .y-axis {
     font-size: 13px;
     fill: #666;
-}
-
-
-/* error bars */
-.ebar .v { /* middle vertical line segment */
-    stroke: #6633FF;
-}
-
-.ebar .l { /* low horizontal line segment */
-    stroke: #6633FF;
-}
-
-.ebar .h { /* high horizontal line segment */
-    stroke: #6633FF;
 }
 
 /* whisker plot */
@@ -842,13 +798,11 @@ circle {
 
 .points .female {
     fill: blue;
-    fill-opacity: .5;
     stroke: blue;
 }
 
 .points .male {
     fill: red;
-    fill-opacity: .5;
     stroke: red;
 }
 
@@ -858,7 +812,7 @@ circle {
 
 .on, .off, .vopt-group-label {
     font-size: 13px;
-    font-family: "Roboto", Arial,Helvetica,sans-serif;
+    font-family: "Source Sans Pro", Arial,Helvetica,sans-serif;
     cursor: pointer;
     margin: 3px;
 }
@@ -893,7 +847,7 @@ circle {
 }
 
 .vopt-group-label {
-    font-family: "Roboto";
+    font-family: "Source Sans Pro";
     color: #777;
     margin-left: 30px;
 }
@@ -914,19 +868,8 @@ circle {
     width: 1px;
 }
 
-.highlight-selection rect {
-    fill: #fff;
-    opacity: .8;
-}
-
-rect.extent {
-    fill: #21b6d2;
-    fill-opacity: .125;
-    stroke: #fff;
-}
-
 .viz-title {
-    font-family: "Roboto", Arial,Helvetica,sans-serif;
+    font-family: "Source Sans Pro", Arial,Helvetica,sans-serif;
     font-size: 17px;    
     text-anchor: middle;
     fill: #555;
@@ -940,18 +883,17 @@ rect.extent {
     font-weight: 100;
 }
 
-
 .viz-legends {
-    font-family: "Roboto", Arial,Helvetica,sans-serif;
+    font-family: "Source Sans Pro", Arial,Helvetica,sans-serif;
     font-size: 12px;
     fill: #555;
 }
 
 .viz-warning {
-    font-family: "Roboto", Arial,Helvetica,sans-serif;
+    font-family: "Source Sans Pro", Arial,Helvetica,sans-serif;
     font-size: 13px;
     text-anchor: middle;
-    fill: #ff6600;
+    fill: #999;
     stroke-width: 0px;
 }
 
@@ -959,10 +901,10 @@ rect.extent {
 .no-issues,
 .select-gene-for-details {
     text-align: center;
-    font-family: "Roboto";
+    font-family: "Source Sans Pro";
     font-size: 14px;
     font-weight: 400;
-    color: #ff6600;
+    color: #999;
     position: absolute;
     width: 100%;
     top: 50%;
@@ -1027,7 +969,7 @@ rect.extent {
 .form-textarea,
 .form-input-text {
     font-size: 13px;
-    font-family: "Roboto", Arial, Helvectica, sans-serif;
+    font-family: "Source Sans Pro", Arial, Helvectica, sans-serif;
     font-weight: 400;
     color: #444;
 }
@@ -1078,16 +1020,17 @@ rect.extent {
 }
 
 #viz-control-buttons {
-    background: #eee;
-    width: 100%;
+    display: inline-block;
+    /* background: #f5f5f5; */
     padding: 0px;
-    border-bottom: 1px solid #e0e0e0;
+    float: right;
+    border-bottom: 0px;
 }
 
-#viz-control-buttons div {
+#viz-control-buttons > div {
     margin: 0px;
-    width: 15%;
-    height: 45px;
+    width: 45px;
+    height: 40px;
     background-position: center;
 }
 
@@ -1107,17 +1050,17 @@ rect.extent {
 
 .user-loggedin {
     float: right;
-    padding: 5px;
+    padding: 18px;
     margin: 5px;
-    font-family: "Roboto";
+    font-family: "Source Sans Pro";
     font-weight: 400;
     font-size: 13px;
 }
 
 .user-loggedin a {
-    padding-left: 15px;
+    padding-left: 5px;
     text-decoration: none;
-    color: #09f;
+    color: #777;
 }
 
 .user-loggedin a:hover {
@@ -1129,23 +1072,24 @@ rect.extent {
     float: left;
     margin-left: 0;
     width: 50%;
+    padding: 11px;
 }
 
 .maintoolbar a {
     display: block;
     float: left;
-    padding-left: 25px;
-    padding-right: 25px;
+    padding-left: 15px;
+    padding-right: 15px;
     text-decoration: none;
-    font-family: "Roboto";
+    font-family: "Source Sans Pro";
+    text-transform: uppercase;
     font-weight: 400;
     font-size: 13px;
-    color: #09f;
+    color: #666;
 }
 
 .maintoolbar .separator {
     float: left;
-    border-left: 1px solid #ddd;
     width: 0;
     height: 18px;
 }
@@ -1155,17 +1099,15 @@ rect.extent {
 }
 
 #ctx-user {
-    font-family: "Roboto";
-    font-weight: 400;
+    font-family: "Source Sans Pro";
+    font-weight: bold;
     font-size: 13px;
-    color: white;
-    background: #f60;
+    color: #000;
     border: 0px;
     padding: 5px;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 2px; 
-    border-radius: 15px;
 }
 
 #specimen-centric-viz-control {
@@ -1244,7 +1186,7 @@ rect.extent {
 
 .phenodcc-value sup,
 .allele-name {
-    color: #666;
+    color: #aaa;
 }
 
 .x-tree-icon {
@@ -1261,14 +1203,13 @@ rect.extent {
     background-color: #fff;
     border-color: #e8e8e8;
     background-image: none;
-    border-right: 0px;
 }
 
 .x-form-item-label,
 .x-panel-header-text-default {
     font-size: 12px;
     font-weight: normal;
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
+    font-family: "Source Sans Pro", Arial, Helvetica, sans-serif;
     color: #777;
     text-align: right;
 }
@@ -1329,7 +1270,7 @@ rect.extent {
 }
 
 .x-column-header-inner .x-column-header-text {
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
+    font-family: "Source Sans Pro", Arial, Helvetica, sans-serif;
     font-size: 13px;
     color: #444;
     text-shadow: 0px 1px #fff;
@@ -1398,6 +1339,17 @@ rect.extent {
     background-image: url('../images/clear_selection.png');
 }
 
+#num-selected-datapoints {
+    display: inline-block;
+    background: #ff6600;
+    padding: 0px;
+    padding-left: 3px;
+    padding-right: 3px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 15px;
+}
+
 .viz-button-clear:hover {
     background-image: url('../images/clear_selection_hover.png');
 }
@@ -1432,7 +1384,7 @@ rect.extent {
 }
 
 .no-selection {
-    font-family: "Roboto";
+    font-family: "Source Sans Pro";
     font-size: 14px;
     font-weight: 400;
     fill: #ff6600;
@@ -1461,7 +1413,7 @@ rect.extent {
 }
 
 [class*="project-"] {
-    font-family: "Roboto", Arial, sans-serif;
+    font-family: "Source Sans Pro", Arial, sans-serif;
     font-size: 13px;
     font-weight: bold;
     color: #777;
@@ -1488,7 +1440,7 @@ rect.extent {
 .timeline-user,
 .timeline-when
 {
-    font-family: "Roboto", Arial, sans-serif;
+    font-family: "Source Sans Pro", Arial, sans-serif;
     font-size: 13px;   
     text-align: center;
     padding: 10px;
@@ -1562,7 +1514,7 @@ rect.extent {
 
 .timeline-popup {
     position: fixed;
-    font-family: "Roboto", Arial;
+    font-family: "Source Sans Pro", Arial;
     font-size: 13px;
     color: #777;
     background: white;
@@ -1570,7 +1522,7 @@ rect.extent {
     max-width: 400px;
     padding: 0px;
     padding-top: 5px;
-        padding-bottom: 5px;
+    padding-bottom: 5px;
 }
 
 .timeline-popup-title {
@@ -1588,7 +1540,7 @@ rect.extent {
 
 #datapoint-infobox,
 .timeline-popup {
-        border: 1px solid #ccc;
+    border: 1px solid #ccc;
     -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .2);
     -ms-box-shadow: 0 0 10px rgba(0, 0, 0, .2);
     -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .2);
@@ -1605,36 +1557,1396 @@ rect.extent {
 }
 
 .allissues-row-nodata .x-grid-cell {
-    background: #ddd;
+    background: rgb(221,221,221);
     color: #777;
 }
 
 .allissues-row-new .x-grid-cell {
-    background: #ff4444;
-    color: #fff;
+    background: rgba(255,68,68, 0.35);
+    color: #333;
 }
 
 .allissues-row-accepted .x-grid-cell {
-    background: #ffd073;
-    color: #000;
+    background: rgba(255,208,115, 0.35);
+    color: #444;
 }
 
 .allissues-row-resolved .x-grid-cell {
-    background: #a3d900;
-    color: #000;
+    background: rgba(163,217,0, 0.35);
+    color: #444;
 }
 
 .allissues-row-dataadded .x-grid-cell {
-    background: #33b5e5;
-    color: #fff;
+    background: rgba(51,181,229, 0.35);
+    color: #444;
 }
 
 .allissues-row-dataremoved .x-grid-cell {
-    background: #aa66cc;
-    color: #fff;
+    background: rgba(170,102,204, 0.35);
+    color: #444;
 }
 
 .allissues-row-datachanged .x-grid-cell {
-    background: #6666ff;
-    color: #fff;
+    background: rgba(102,102,255, 0.35);
+    color: #444;
 }
+
+#header {
+    height: 66px;
+    font-size: 14px;
+}
+
+#content {
+    position: absolute;
+    float: left;
+    top: 40px;
+    width: 100%;
+}
+
+#sidebar {
+    position: absolute;
+    float: left;
+    height: 41px;
+    width: 100%;
+    /* background-color: #f5f5f5; */
+    /* border-bottom: 1px solid #ebebeb; */
+}
+
+.control-group {
+    height: 40px;
+    width: 50px;
+    padding: 0px;
+    overflow: hidden;
+    /* background-color: #f5f5f5; */
+}
+
+.control-expanded {
+    box-shadow: 0px 1px 10px 0px rgba(0,0,0,0.25);
+    background-color: #fbfbfb;
+}
+
+.control-group div {
+    clear: none;
+}
+
+#controls div {
+    display: inline-block;
+    float: left;
+}
+
+.control {
+    float: left;
+    height: 40px;
+    width: 50px;
+    padding: 8px;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+
+.control:hover {
+    background-color: #eaeaea;
+}
+
+.infobar-off {
+    background-image: url("../images/infobar_off.png");
+}
+
+.crosshair-off {
+    background-image: url("../images/crosshair_off.png");
+}
+
+.male-off {
+    background-image: url("../images/male_off.png");
+}
+
+.female-off {
+    background-image: url("../images/female_off.png");
+}
+
+.male_female-off {
+    background-image: url("../images/male_female_off.png");
+}
+
+.hom-off {
+    background-image: url("../images/hom_off.png");
+}
+
+.het-off {
+    background-image: url("../images/het_off.png");
+}
+
+.hem-off {
+    background-image: url("../images/hem_off.png");
+}
+
+.zygosity_all-off {
+    background-image: url("../images/zygosity_all_off.png");
+}
+
+.wildtype-off {
+    background-image: url("../images/wildtype_off.png");
+}
+
+.swarm-off {
+    background-image: url("../images/swarm_off.png");
+}
+
+.point-off {
+    background-image: url("../images/point_off.png");
+}
+
+.polyline-off {
+    background-image: url("../images/polyline_off.png");
+}
+
+.whisker-off {
+    background-image: url("../images/whisker_off.png");
+}
+
+.whisker_extrema-off {
+    background-image: url("../images/whisker_extrema_off.png");
+}
+
+.whisker_iqr-off {
+    background-image: url("../images/whisker_iqr_off.png");
+}
+
+.errorbar-off {
+    background-image: url("../images/errorbar_off.png");
+}
+
+.std_err-off {
+    background-image: url("../images/std_err_off.png");
+}
+
+.statistics-off {
+    background-image: url("../images/statistics_off.png");
+}
+
+.quartile-off {
+    background-image: url("../images/quartile_off.png");
+}
+
+.min-off {
+    background-image: url("../images/min_off.png");
+}
+
+.max-off {
+    background-image: url("../images/max_off.png");
+}
+
+.mean-off {
+    background-image: url("../images/mean_off.png");
+}
+
+.median-off {
+    background-image: url("../images/median_off.png");
+}
+
+.newdata-off {
+    background-image: url("../images/newdata_off.png");
+}
+
+.zoom_small-off {
+    background-image: url("../images/zoom_small_off.png");
+}
+
+.zoom_medium-off {
+    background-image: url("../images/zoom_medium_off.png");
+}
+
+.zoom_large-off {
+    background-image: url("../images/zoom_large_off.png");
+}
+
+.zoom_xlarge-off {
+    background-image: url("../images/zoom_xlarge_off.png");
+}
+
+.highlight-off {
+    background-image: url("../images/highlight_off.png");
+}
+
+.selected-off {
+    background-image: url("../images/selected_off.png");
+}
+
+.contract-button {
+    background-image: url("../images/contract.png");
+}
+
+.infobar-on {
+    background-image: url("../images/infobar_on.png");
+}
+
+.crosshair-on {
+    background-image: url("../images/crosshair_on.png");
+}
+
+.male-on {
+    background-image: url("../images/male_on.png");
+}
+
+.female-on {
+    background-image: url("../images/female_on.png");
+}
+
+.male_female-on {
+    background-image: url("../images/male_female_on.png");
+}
+
+.hom-on {
+    background-image: url("../images/hom_on.png");
+}
+
+.het-on {
+    background-image: url("../images/het_on.png");
+}
+
+.hem-on {
+    background-image: url("../images/hem_on.png");
+}
+
+.zygosity_all-on {
+    background-image: url("../images/zygosity_all_on.png");
+}
+
+.wildtype-on {
+    background-image: url("../images/wildtype_on.png");
+}
+
+.swarm-on {
+    background-image: url("../images/swarm_on.png");
+}
+
+.point-on {
+    background-image: url("../images/point_on.png");
+}
+
+.polyline-on {
+    background-image: url("../images/polyline_on.png");
+}
+
+.whisker-on {
+    background-image: url("../images/whisker_on.png");
+}
+
+.whisker_extrema-on {
+    background-image: url("../images/whisker_extrema_on.png");
+}
+
+.whisker_iqr-on {
+    background-image: url("../images/whisker_iqr_on.png");
+}
+
+.errorbar-on {
+    background-image: url("../images/errorbar_on.png");
+}
+
+.std_err-on {
+    background-image: url("../images/std_err_on.png");
+}
+
+.statistics-on {
+    background-image: url("../images/statistics_on.png");
+}
+
+.quartile-on {
+    background-image: url("../images/quartile_on.png");
+}
+
+.min-on {
+    background-image: url("../images/min_on.png");
+}
+
+.max-on {
+    background-image: url("../images/max_on.png");
+}
+
+.mean-on {
+    background-image: url("../images/mean_on.png");
+}
+
+.median-on {
+    background-image: url("../images/median_on.png");
+}
+
+.newdata-on {
+    background-image: url("../images/newdata_on.png");
+}
+
+.zoom_small-on {
+    background-image: url("../images/zoom_small_on.png");
+}
+
+.zoom_medium-on {
+    background-image: url("../images/zoom_medium_on.png");
+}
+
+.zoom_large-on {
+    background-image: url("../images/zoom_large_on.png");
+}
+
+.zoom_xlarge-on {
+    background-image: url("../images/zoom_xlarge_on.png");
+}
+
+.highlight-on {
+    background-image: url("../images/highlight_on.png");
+}
+
+.selected-on {
+    background-image: url("../images/selected_on.png");
+}
+
+#infobar {
+    width: 100%;
+    height: 40px;
+    overflow: hidden;
+    box-shadow: inset 0px 0px 2px 0px #000;
+    background: #118cff; /* Old browsers */
+    background: -moz-linear-gradient(top,  #118cff 0%, #006be6 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#118cff), color-stop(100%,#006be6)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #118cff 0%,#006be6 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #118cff 0%,#006be6 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #118cff 0%,#006be6 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #118cff 0%,#006be6 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#118cff', endColorstr='#006be6',GradientType=0 ); /* IE6-9 */
+
+}
+
+#infobar table {
+    margin: 0px;
+    padding: 0px;
+    border-collapse: separate;
+    table-layout: fixed;
+    border-spacing: 15px 0px;
+}
+
+#infobar td {
+    margin: 0px;
+    padding: 0px;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 7px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0px 0px 1px rgba(0,0,0,.8);
+}
+
+[class*='infobar-'] {
+    color: #fff;
+    float: left;
+}
+
+.infobar-centre {
+    padding: 3px;
+    font-weight: bold;
+    margin-top: 2px;
+}
+
+.infobar-centre:after {
+    content: url("../images/dot.png");
+    margin-left: 10px;
+}
+
+.infobar-mgi {
+    padding: 5px;
+    text-decoration: none;
+}
+
+a.infobar-mgi:hover {
+    color: #ff0;
+    text-decoration: underline;
+}
+
+.infobar-mgi:after {
+    content: url("../images/dot.png");
+    margin-left: 10px;
+}
+
+.infobar-allele {
+    padding: 3px;
+}
+
+.infobar-strain {
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.infobar-strain:after {
+    content: url("../images/dot.png");
+    margin-left: 10px;
+}
+
+#cluster {
+    overflow: auto;
+    background: #fff;
+}
+
+.cluster {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    border-collapse: separate;
+    border-spacing: 10px;
+}
+
+.cluster tr,
+.cluster td {
+    padding: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+[class*="viz-container-"] {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+    float: left;
+    background-color: #fff;
+}
+
+.chart {
+    width: 100%;
+    height: 100%;
+}
+
+svg {
+    float: left;
+    font-size: 13px;
+    opacity: 1;
+    fill: #555;
+    width: 100%;
+    height: 100%;
+}
+
+/* mouse pointer cross hair */
+.xhair line {
+    stroke: #bbb;
+    stroke-dasharray: 2,2;
+    stroke-width: 1px;
+}
+
+#datapoint-infobox {
+    font-family: "Source Sans Pro", Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    color: #444;
+    background-color: rgba(255,255,255,1);
+    background-repeat: no-repeat;
+    background-position: right bottom;
+    background-origin: content-box;
+    width: 300px;
+    max-height: 200px;
+    position: fixed;
+    padding: 15px;
+    margin: 0;
+    border: 1px solid #d5d5d5;
+    -moz-box-shadow: 0 0 15px rgba(0, 0, 0, .2);
+    -ms-box-shadow: 0 0 15px rgba(0, 0, 0, .2);
+    -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, .2);
+    box-shadow: 0 0 15px rgba(0, 0, 0, .2);
+}
+
+#datapoint-infobox hr {
+    border: 0;
+    height: 1px;
+    background: #ccc; 
+}
+
+#datapoint-infobox ul {
+    list-style: none;
+    padding: 0px;
+}
+
+#datapoint-infobox ul li b {
+    color: #777;
+    padding-right: 6px;
+    width: 40px;
+    display: inline-block;
+    text-align: right;
+    font-weight: 400;
+}
+
+.Male-Homozygous {
+    background-image: url('../images/male_hom.png');
+}
+.Male-Heterozygous {
+    background-image: url('../images/male_het.png');
+}
+.Male-Hemizygous {
+    background-image: url('../images/male_hem.png');
+}
+.Male-Invalid {
+    background-image: url('../images/male_inv.png');
+}
+.Female-Homozygous {
+    background-image: url('../images/female_hom.png');
+}
+.Female-Heterozygous {
+    background-image: url('../images/female_het.png');
+}
+.Female-Hemizygous {
+    background-image: url('../images/female_hem.png');
+}
+.Female-Invalid {
+    background-image: url('../images/female_inv.png');
+}
+.Invalid-Homozygous {
+    background-image: url('../images/inv_hom.png');
+}
+.Invalid-Heterozygous {
+    background-image: url('../images/inv_het.png');
+}
+.Invalid-Hemizygous {
+    background-image: url('../images/inv_hem.png');
+}
+.Invalid-Invalid {
+    background-image: url('../images/inv_inv.png');
+}
+
+/* polylines */
+polyline {
+    fill: none;
+    stroke-width: 1px;
+}
+
+.all-points .series polyline {
+    stroke: blue;
+    stroke-width: 4px;
+}
+
+.all-wildtype-points .series polyline {
+    stroke: green;
+    stroke-width: 4px;
+}
+
+.series.highlighted polyline {
+    stroke: red;
+    stroke-width: 1px;
+}
+
+.stat rect, 
+.stat line {
+    shape-rendering: crispEdges;
+    stroke-width: 1px;
+}
+
+.wildtype-mean,
+.mean {
+    stroke: green;
+}
+
+.wildtype-median,
+.median {
+    stroke: #00B8F5;
+}
+
+.wildtype-max,
+.max {
+    stroke: #6633FF;
+}
+
+.wildtype-min,
+.min {
+    stroke: #a7c520;
+}
+
+.wildtype-q1,
+.q1 {
+    stroke: #CC33FF;
+}
+
+.wildtype-q3,
+.q3 {
+    stroke: #FF33CC;
+}
+
+.wildtype {
+    stroke-dasharray: 5,5;
+    stroke: #000;
+    stroke-width: 2px;
+}
+
+.wildtype-mean,
+.wildtype-median,
+.wildtype-max,
+.wildtype-min,
+.wildtype-q1,
+.wildtype-q3 {
+    stroke-dasharray: 5,5;
+    stroke-width: 1px;
+}
+
+/* error bars */
+.ebar line,
+.wildtype.ebar line {
+    stroke-dasharray: none;    
+    stroke: blue;
+    stroke-width: 2px;
+}
+.mutant.ebar line {
+    stroke-dasharray: none;    
+    stroke: red;
+    stroke-width: 2px;
+}
+
+/* circles */
+.male.highlight-n circle {
+    fill:  red;
+}
+
+.all-points .series circle {
+}
+
+.all-points .series circle:hover {
+    stroke: red;
+}
+
+.all-points .series .to-remove,
+.series.highlighted .to-remove
+{
+    fill: blue;
+    stroke-width: 3px;
+    stroke: black;
+}
+
+.highlight-selection .to-remove {
+    fill: red;
+    stroke: red;
+}
+
+.stat .series circle {
+    stroke-dasharray: none;
+}
+
+.wildtype-mean circle,
+.mean circle {
+    stroke: green;
+    fill: green;
+}
+
+.wildtype-median circle,
+.median circle {
+    stroke: #00B8F5;
+    fill: #00B8F5;
+}
+
+.wildtype-max circle,
+.max circle {
+    stroke: #6633FF;
+    fill: #6633FF;
+}
+
+
+.wildtype-min circle,
+.min circle {
+    stroke: #a7c520;
+    fill: #a7c520;
+}
+
+.wildtype-q1 circle,
+.q1 circle {
+    stroke: #CC33FF;
+    fill: #CC33FF;
+}
+
+.wildtype-q3 circle,
+.q3 circle {
+    stroke: #FF33CC;
+    fill: #FF33CC;
+}
+
+.all-wildtype-points .series rect {
+}
+
+.all-wildtype-points .series rect:hover {
+    stroke: red;
+    stroke-width: 6px;
+}
+
+/* text */
+text {
+    stroke-width: 0;
+    font-size: 10pt;
+}
+
+.mean text {
+    fill: green;
+}
+
+.median text {
+    fill: #00B8F5;
+}
+
+.max text {
+    fill: #6633FF;
+}
+
+.min text {
+    fill: #a7c520;
+}
+
+.q1 text {
+    fill: #CC33FF;
+}
+
+.q3 text {
+    fill: #FF33CC;
+}
+
+.mutant-datapoints .male.selected,
+.mutant-datapoints .female.selected,
+.highlight-selection circle,
+.legend-selected {
+    stroke-width: 2px;
+    stroke: #C423B9;
+    fill: #F26FF7;
+}
+
+.legend-highlighted {
+    stroke-width: 3px;
+    stroke: #ee0000;
+    fill: #ff0000;
+}
+
+
+rect.selected {
+    fill: red;
+    stroke: black;
+}
+
+.hide-pointer {
+    cursor: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #999;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-size: 11px;
+    font-weight: normal;
+    fill: #222;
+}
+
+.x-axis, .y-axis {
+    font-size: 13px;
+    font-weight: 700;
+    fill: #666;
+}
+
+.segment-0 { fill: magenta; stroke: #b200b2; } /* highlighted specimen */
+.segment-1 { fill: #1f77b4; stroke: #15537d; }
+.segment-2 { fill: #aec7e8; stroke: #798ba2; }
+.segment-3 { fill: #ff7f0e; stroke: #b25809; }
+.segment-4 { fill: #ffbb78; stroke: #b28254; }
+.segment-5 { fill: #2ca02c; stroke: #1e701e; }
+.segment-6 { fill: #98df8a; stroke: #6a9c60; }
+.segment-7 { fill: #d62728; stroke: #951b1c; }
+.segment-8 { fill: #ff9896; stroke: #b26a69; }
+.segment-9 { fill: #9467bd; stroke: #674884; }
+.segment-10 { fill: #c5b0d5; stroke: #897b95; }
+.segment-11 { fill: #8c564b; stroke: #623c34; }
+.segment-12 { fill: #c49c94; stroke: #896d67; }
+.segment-13 { fill: #e377c2; stroke: #9e5387; }
+.segment-14 { fill: #f7b6d2; stroke: #ac7f93; }
+.segment-15 { fill: #7f7f7f; stroke: #585858; }
+.segment-16 { fill: #c7c7c7; stroke: #8b8b8b; }
+.segment-17 { fill: #bcbd22; stroke: #838417; }
+.segment-18 { fill: #dbdb8d; stroke: #999962; }
+.segment-19 { fill: #17becf; stroke: #108590; }
+.segment-20 { fill: #9edae5; stroke: #6e98a0; }
+
+.categorical-legend {
+    text-anchor: start;
+    font-size: 12px;
+    font-weight: bold;
+    fill: #555;
+}
+
+.grid-bar {
+    shape-rendering: crispEdges;
+    stroke: #555;
+}
+
+.segment-label {
+    text-anchor: start;
+    fill: #444;
+}
+
+.category-detail-header {
+    color: orangered;
+    font-weight: bold;
+}
+
+.categorical-datapoints {
+    text-anchor: middle;
+    fill: #555;
+}
+
+.category-grid-label,
+.segment-column-label {
+    text-anchor: middle;
+    font-size: 13px;
+    fill: #444;
+}
+
+/* whisker plot */
+.whisker.mutant,
+.whisker.wildtype {
+    stroke-dasharray: none;
+    stroke: #aaa;
+}
+
+.whisker .v { /* middle vertical line segment */
+}
+
+.whisker .l { /* low horizontal line segment */
+}
+
+.whisker .h { /* high horizontal line segment */
+}
+
+.whisker .m { /* horizontal line segment at median */
+    stroke-width: 2px;
+    stroke: #666;
+}
+
+.whisker.mutant { /* box */
+    fill: #ffffd9;
+}
+
+.whisker.wildtype { /* box */
+    fill: #d9ffec;
+}
+
+/* night and day separator */
+.day-night {
+    fill: #ddd;
+}
+
+/* histogram style */
+.histogram {
+    shape-rendering: crispEdges;
+}
+
+.histogram .columns rect {
+    stroke: #6594D0;
+    fill: #C0D0E5;
+}
+
+/* column label */
+.histogram .labels text {
+    font-family: arial;
+    font-size: 10pt;
+    text-anchor: middle;
+}
+
+.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.points .female {
+    fill: blue;
+    stroke: blue;
+}
+
+.points .male {
+    fill: red;
+    stroke: red;
+}
+
+.highlight-selection rect {
+    fill: #fff;
+    fill-opacity: 0.7;
+}
+
+rect.extent {
+    shape-rendering: crispEdges;
+    fill: #555;
+    stroke: #000;
+    stroke-width: 1px;
+    stroke-opacity: 0.1;
+    fill-opacity: 0.1;
+}
+
+.viz-title {
+    font-family: "Source Sans Pro";
+    font-size: 18px;    
+    text-anchor: middle;
+    fill: #555;
+}
+.viz-title tspan:first-child {
+    fill: #555;
+    font-weight: 200;
+}
+.viz-title tspan:last-child {
+    fill: #000;
+    font-weight: 600;
+}
+
+.viz-legends {
+    font-family: "Source Sans Pro";
+    font-size: 12px;
+    fill: #333;
+}
+
+.viz-warning {
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+    text-anchor: middle;
+    fill: orangeRed;
+    stroke-width: 0px;
+}
+
+.no-visualisation,
+.no-issues {
+    height: 100%;
+    text-align: center;
+    font-size: 14px;
+    font-weight: normal;
+    color: #999;
+    padding-top: 0px;
+}
+
+.warning {
+    height: 100%;
+    width: 90%;
+    margin-top: 20%;
+    text-align: center;
+    vertical-align: middle;
+    color: #555;
+    font-size: 13px;
+}
+
+.warn-message {
+    color: orangered;
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.warn-parameter-key:before {
+    content: "Key: ";
+    color: #888;
+}
+
+.warn-parameter:before {
+    content: "Parameter: ";
+    color: #888;
+}
+
+.warn-procedure:before {
+    content: "Procedure: ";
+    color: #888;
+}
+
+.viz-tools {
+    height: 40px;
+    width: 100%;
+    position: relative;
+}
+
+.share-button,
+.download-button {
+    width: 20px;
+    height: 20px;
+    background-position: center;
+    background-repeat: no-repeat;
+    top: 15px;
+    position: absolute;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.download-button {
+    background-image: url("../images/download_off.png");
+    right: 15px;
+}
+
+.share-button {
+    right: 35px;
+}
+
+.download-button:hover {
+    background-image: url("../images/download_on.png");
+}
+
+.share-button:hover {
+    background-image: none;
+}
+
+.email-button,
+.facebook-button,
+.twitter-button {
+    width: 20px;
+    height: 20px;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    position: relative;
+    float: left;
+}
+
+.email-button {
+    background-image: url("../images/share_off.png");
+}
+.email-button:hover {
+    background-image: url("../images/share_on.png");
+}
+
+.facebook-button {
+    background-image: url("../images/facebook_off.png");
+}
+.facebook-button:hover {
+    background-image: url("../images/facebook_on.png");
+}
+
+.twitter-button {
+    background-image: url("../images/twitter_off.png");
+}
+.twitter-button:hover {
+    background-image: url("../images/twitter_on.png");
+}
+
+.empty-selection {
+    padding-top: 3px;
+    padding-left: 30px;
+    margin-right: 10px;
+    background-image: url("../images/wastebin_off.png");
+    background-position: top left;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    color: #777;
+    font-size: 14px;
+}
+
+.empty-selection:hover {
+    color: #ff6600;
+    background-image: url("../images/wastebin_on.png");
+}
+
+.viz-legends circle.male,
+.mutant-datapoints circle.male {
+    stroke-width: 1px;
+    stroke: #436DE2;
+    fill: #76afE2;
+}
+
+.viz-legends circle.female,
+.mutant-datapoints circle.female {
+    stroke-width: 1px;
+    stroke: #ff7c5a;
+    fill: #faaa3b;
+}
+
+.viz-legends rect.male,
+.wildtype-datapoints rect.male,
+.wildtype-datapoints circle.male {
+    stroke-width: 0px;
+    fill: #51bf43;
+}
+
+.viz-legends rect.female,
+.wildtype-datapoints rect.female,
+.wildtype-datapoints circle.female {
+    stroke-width: 0px;
+    fill: #f779c3;
+}
+
+.mutant-datapoints circle.highlight-h,
+circle.highlight-h {
+    stroke-width: 3px;
+    stroke: red;
+    fill: red;
+}
+
+/* new data points since last human action */
+.mutant-datapoints circle.highlight-n,
+circle.highlight-n {
+    stroke-width: 0px;
+    fill: #311D15;
+}
+
+rect.highlight {
+    fill: red;
+    stroke: red;
+}
+
+.arc text {
+    text-anchor: middle;
+    fill: #fff;
+    font-family: "Source Sans Pro";
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 0px 0px 2px rgba(0,0,0,0.5);
+}
+
+text.pie-label {
+    text-anchor: middle;
+    fill: #000;
+    font-size: 13px;
+}
+
+text.pie-piece-label {
+    font-size: 13px;
+}
+
+text.pie-percentage {
+    font-size: 11px;
+    fill: #000;
+    text-shadow: 0px 0px 0px rgba(0,0,0,0);
+}
+
+.pie-table {
+    padding: 0px;
+    font-size: 13px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pie-table table {
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+}
+
+.pie-table td {
+    padding: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: right;
+    width: 70px;
+}
+
+.pie-table table tr:first-child,
+.pie-table table tr td:first-child {
+    background: #eee;
+    color: #333;
+    font-weight: bold;
+}
+
+.pie-table table tr td:first-child {
+    width: 300px;
+}
+
+td.row-total,
+td.column-total {
+    font-weight: bold;
+    color: #ff4400;
+}
+
+.pie-gap-label {
+    text-anchor: middle;
+    font-weight: bold;
+    font-size: 32px;
+    fill: black;
+}
+
+.viability-title {
+    font-family: "Source Sans Pro";
+    font-size: 14px;    
+    text-align: center;
+    color: #555;
+    padding: 10px;
+}
+.viability-title span:first-child {
+    color: #444;
+    font-weight: 700;
+    padding-right: 5px;
+}
+.viability-title span:last-child {
+    color: #555;
+    font-weight: 300;
+}
+
+#cited-notification {
+    position: absolute;
+    display: block;
+    bottom: 0px;
+    right: 0px;
+    background: #eee;
+    padding: 5px;
+    padding-left: 25px;
+    padding-right: 10px;
+    font-size: 13px;
+    background-image: url("../images/loading_small.gif");
+    background-repeat: no-repeat;
+    background-position: 5px;
+}
+
+.infobar-stat-wildtype {
+    padding-top: 5px !important;
+}
+
+.infobar-stat-mutant {
+    padding-top: 5px !important;
+}
+
+.infobar-stat-wildtype::before {
+    content: 'Wildtype Statistics';
+    display: block;
+    width: 100%;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+}
+
+.infobar-stat-mutant::before {
+    content: 'Mutant Statistics';
+    display: block;
+    width: 100%;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+}
+
+[class^="infobar-stat-"] table {
+    margin-top: 5px;
+    width: 100%;
+}
+
+[class^="infobar-stat-"] table tbody tr td:first-child {
+    text-align: right;
+    font-weight: bold;
+    padding-right: 10px;
+    width: 50%;
+}
+
+circle.male.to-select,
+circle.female.to-select
+{
+    fill: orange;
+    stroke-width: 1.5px;
+    stroke: orangered;
+}
+
+.x-message-box .x-window-body {
+    background-color: #fff;
+}
+
+.x-form-display-field {
+        font-family: "Source Sans Pro", Arial, Helvetica, sans-serif !important;
+    font-size: 13px !important;
+}
+
+#context-details {
+    position: fixed;
+    top: 65px;
+    right: 0px;
+    display: block;
+    font-size: 13px;
+}
+
+#context-details div {
+    float: left;
+}
+
+#context-details div:after {
+    content: url('../images/gray_dot.png');
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+#context-details div:last-child:after {
+    content: '';
+    margin-right: 0px;
+}
+
+#add-comment,
+#accept-issue,
+#resolve-issue,
+#delete-issue {
+    border: 0px solid #bbb;
+    color: #fff;
+    text-shadow: 0px 0px 0px rgba(0,0,0,0);
+}
+
+#add-comment {
+    background: #80A009;
+}
+
+#accept-issue {
+    background: #803D01;
+}
+
+#resolve-issue {
+    background: #078855;
+}
+
+#delete-issue {
+    float: right;
+    margin-right: 20px;
+    color: #fff;
+    background: #F8403F;
+}
+
+#issue-warnings {
+    background: #F9E45D;
+    padding: 6px;
+    height: 100%;
+}
+
+#issue-info {
+    background: #C5F5B4;
+    padding: 6px;
+    height: 100%;
+}
+
+.swarm-label {
+    text-anchor: middle;
+    font-size: 12px;
+}
+
+/* override image viewer styles */
+.image-viewer-title {
+    padding: 10px;
+    color: #000;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.mode-switcher,
+.specimen-selector,
+.viewer-controls,
+.switch-split-type {
+    float: right;
+    width: 50px;
+}
+
+.mode-switcher:hover,
+.specimen-selector:hover,
+.viewer-controls:hover,
+.switch-split-type:hover {
+    box-shadow: inset 0px 0px 40px 0px rgba(255,102,0,.25);
+}
+
+.image-panel-download {
+    height: 25px;
+}
+
+.no-measurements {
+    width: 100%;
+    height: 100%;
+    background: #f5f5f5;
+    text-align: center;
+    line-height: 30;
+    font-size: 18px;
+    color: #777;
+}
+

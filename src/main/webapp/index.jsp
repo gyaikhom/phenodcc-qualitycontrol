@@ -23,7 +23,9 @@ limitations under the License.
         <title>PhenoDCC Quality Control Web Application</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <link href='https://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600' rel='stylesheet' type='text/css'>
+        <!-- after updating image viewer, don't forget to change the follow -->
+        <link rel="stylesheet" type="text/css" href="/imageviewer/css/imageviewer.0.5.css">
         <link rel="stylesheet" type="text/css" href="resources/css/phenodcc.DCC_QC_VERSION.css">
     </head>
     <body>
@@ -57,6 +59,8 @@ limitations under the License.
         </div>
 
         <script type="text/javascript" src="app.DCC_QC_VERSION.js"></script>
+        <!-- after updating image viewer, don't forget to change the follow -->
+        <script type="text/javascript" src="/imageviewer/js/app.0.5.js"></script>
         <script>
             Ext.onReady(function() {
                 dcc.dataContext = {
@@ -81,14 +85,10 @@ limitations under the License.
                 dcc.allissuesFilter = parseInt('<%= request.getParameter("if")%>');
                 if (isNaN(dcc.allissuesFilter))  dcc.allissuesFilter = 63;
 
-                dcc.control_options = {
-                    'series': parseInt('<%= request.getParameter("sctrl")%>'),
-                    'point': parseInt('<%= request.getParameter("pctrl")%>')
-                }
-                if (isNaN(dcc.control_options.series)
-                    && isNaN(dcc.control_options.point))
-                    dcc.control_options = null;
-            })
+                var ctrl = parseInt('<%= request.getParameter("ctrl")%>');
+                if (!isNaN(ctrl))
+                    dcc.visualisationControl = ctrl;
+            });
         </script>
     </body>
 </html>

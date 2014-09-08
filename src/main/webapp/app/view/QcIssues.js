@@ -23,7 +23,7 @@ Ext.define('PhenoDCC.view.QcIssues', {
     title: 'Quality Control issues',
     alias: 'widget.qcissues',
     requires: [
-    'PhenoDCC.view.IssuesPanel'
+        'PhenoDCC.view.IssuesPanel'
     ],
     layout: 'fit',
     items: {
@@ -31,23 +31,35 @@ Ext.define('PhenoDCC.view.QcIssues', {
         layout: 'border',
         border: 0,
         items: [
-        {
-            xtype: 'issuespanel',
-            id: 'data-view-issues-panel',
-            region: 'east',
-            width: '50%',
-            split: true,
-            layout: 'border',
-            border: 0
-        },
-        {
-            xtype: 'container',
-            id: 'data-view-actions-panel',
-            region: 'center',
-            width: '50%',
-            layout: 'border',
-            border: 0
-        }
+            {
+                xtype: 'issuespanel',
+                id: 'data-view-issues-panel',
+                region: 'east',
+                width: '50%',
+                split: true,
+                layout: 'border',
+                border: 0
+            },
+            {
+                xtype: 'container',
+                region: 'center',
+                width: '50%',
+                layout: 'border',
+                border: 0,
+                items: [
+                    {
+                        xtype: 'container',
+                        id: 'issue-messages-panel',
+                        region: 'north',
+                        height: '30px'
+                    },
+                    {
+                        xtype: 'container',
+                        id: 'data-view-actions-panel',
+                        region: 'center'
+                    }
+                ]
+            }
         ]
     }
 });

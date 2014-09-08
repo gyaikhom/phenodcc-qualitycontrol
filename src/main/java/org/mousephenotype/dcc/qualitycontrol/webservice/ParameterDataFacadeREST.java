@@ -85,16 +85,18 @@ public class ParameterDataFacadeREST extends AbstractFacade<Parameter> {
     private ParameterData fillIncrement(
             ParameterData pd,
             Parameter p) {
-        Collection<ParamIncrement> phic =
-                p.getParamIncrementCollection();
+        Collection<ParamIncrement> phic
+                = p.getParamIncrementCollection();
         Iterator<ParamIncrement> pici = phic.iterator();
         if (pici.hasNext()) {
             ParamIncrement pi = pici.next();
-            pd.setIncrementId(pi.getParamIncrementId());
-            pd.setIncrementMin(pi.getIncrementMin());
-            pd.setIncrementType(pi.getIncrementType());
-            pd.setIncrementUnit(pi.getIncrementUnit());
-            pd.setIncrementValue(pi.getIncrementString());
+            if (pi.getDeleted() == false) {
+                pd.setIncrementId(pi.getParamIncrementId());
+                pd.setIncrementMin(pi.getIncrementMin());
+                pd.setIncrementType(pi.getIncrementType());
+                pd.setIncrementUnit(pi.getIncrementUnit());
+                pd.setIncrementValue(pi.getIncrementString());
+            }
         }
         return pd;
     }
@@ -130,14 +132,14 @@ public class ParameterDataFacadeREST extends AbstractFacade<Parameter> {
             Integer genotypeId,
             Integer strainId,
             Integer procedureId) {
-        boolean updateState = centreId != null && centreId > -1 &&
-                pipelineId != null && pipelineId > -1 &&
-                genotypeId != null && genotypeId > -1 &&
-                strainId != null && strainId > -1 &&
-                procedureId != null && procedureId > -1;
+        boolean updateState = centreId != null && centreId > -1
+                && pipelineId != null && pipelineId > -1
+                && genotypeId != null && genotypeId > -1
+                && strainId != null && strainId > -1
+                && procedureId != null && procedureId > -1;
         List<ParameterData> pdl = new ArrayList<>();
-        Iterator<ProcedureHasParameters> pphpci =
-                pphpc.iterator();
+        Iterator<ProcedureHasParameters> pphpci
+                = pphpc.iterator();
         if (pphpci.hasNext()) {
             TypedQuery<StateAndUnresolvedIssuesCount> c = em.createNamedQuery(
                     "DataContext.findParameterState",
@@ -154,7 +156,8 @@ public class ParameterDataFacadeREST extends AbstractFacade<Parameter> {
                 ProcedureHasParameters pphp = pphpci.next();
                 Parameter p = pphp.getParameterId();
 
-                if (p.getGraphType() == null) {
+                if (p.getGraphType() == null
+                        || "procedureMetadata".equals(p.getType())) {
                     continue;
                 }
 
@@ -168,14 +171,15 @@ public class ParameterDataFacadeREST extends AbstractFacade<Parameter> {
                 if (updateState) {
                     c.setParameter("parameterId", p.getParameterId());
                     try {
-                        StateAndUnresolvedIssuesCount stateAndCount =
-                                c.getSingleResult();
+                        StateAndUnresolvedIssuesCount stateAndCount
+                                = c.getSingleResult();
                         if (stateAndCount != null) {
                             pd.setStateId(stateAndCount.getStateId());
                             pd.setNumUnresolved(stateAndCount.getNumUnresolved());
                         }
                     } catch (NoResultException e) {
                         pd.setStateId((short) 0); /* default: no data */
+
                     }
                 }
                 pdl.add(pd);
@@ -183,12 +187,12 @@ public class ParameterDataFacadeREST extends AbstractFacade<Parameter> {
         }
         return pdl;
     }
-    private Comparator<ProcedureHasParameters> comparator =
-            new Comparator<ProcedureHasParameters>() {
+    private Comparator<ProcedureHasParameters> comparator
+            = new Comparator<ProcedureHasParameters>() {
                 @Override
                 public int compare(ProcedureHasParameters a, ProcedureHasParameters b) {
                     String name = a.getParameterId().getName(),
-                            key = a.getParameterId().getParameterKey();
+                    key = a.getParameterId().getParameterKey();
                     int value = name.compareTo(b.getParameterId().getName());
                     if (value == 0) {
                         value = key.compareTo(b.getParameterId().getParameterKey());
@@ -214,11 +218,11 @@ public class ParameterDataFacadeREST extends AbstractFacade<Parameter> {
             EntityManager em = getEntityManager();
             Procedure pp = em.find(Procedure.class, procedureId);
             if (pp != null) {
-                Collection<ProcedureHasParameters> pphpc =
-                        pp.getProcedureHasParametersCollection();
+                Collection<ProcedureHasParameters> pphpc
+                        = pp.getProcedureHasParametersCollection();
                 if (pphpc != null) {
-                    List<ProcedureHasParameters> list =
-                            new ArrayList<>(pphpc);
+                    List<ProcedureHasParameters> list
+                            = new ArrayList<>(pphpc);
                     Collections.sort(list, comparator);
                     pdl = this.getParameters(list, em, centreId,
                             pipelineId, genotypeId, strainId, procedureId);

@@ -1,6 +1,6 @@
 % Users' Manual: _Quality Control Web Application_
-% The PhenoDCC Team
-% Last updated: 19 July 2013
+% The PhenoDCC Team (written by Gagarine Yaikhom)
+% Last updated: 21 July 2014
 
 <div class="version">This users' manual describes version 2 of the
 _Quality Control Web Application_.</div>
@@ -281,7 +281,8 @@ already minimised, the control has no effect.
 
 ### Using the cross-hair
 
-If the <span class="control">_Cross hair_</span> control is checked,
+If the _Cross-hair_ control <img
+src="../resources/images/crosshair_on.png"></img> is checked,
 the visualisation will display a _cross-hair_ with two line segments,
 one vertical and the other horizontal, so that they intersect at the
 location of the mouse pointer. When the user moves the mouse cursor
@@ -293,21 +294,13 @@ to check if certain data points have similar values.
 ![Visualisation with cross-hair][show_crosshair]
 
 
-### Vertical and horizontal axes
-
-Unchecking the <span class="control">_X-axis and label_</span>
-control hides the _x_-axis line, ticks, and the axis label. Similarly,
-unchecking the <span class="control">_Y-axis and label_</span>
-control hides the _y_-axis line, ticks, and the axis label. This is
-shown below.
-
-![Hidden axes and labels][hide_axes]
-
 ### Highlighting specimen data-points
 
 To highlight the data points that correspond to a specific specimen,
-simply select the required specimen from the <span
-class="panel">_Specimens_</span> panel. The visualisation will
+activate the _Highlight specimen_ control <img
+src="../resources/images/highlight_on.png"></img> and simply select the
+required specimen from the <span class="panel">_Specimen and experiment
+details_</span> panel. The visualisation will
 refresh, and the data-points that correspond to the specimen will be
 highlighted. This is shown below.
 
@@ -330,57 +323,48 @@ position, as this makes reading the details easier. However, if such a
 placement is not possible, the web application will automatically
 choose an appropriate alternative placement.
 
+### Filter data points by gender
 
-### Show/hide all of the data points
-
-Checking the <span class="control">_Show data points_</span>
-control displays all of the data points that are associated with all
-of the specimens listed in the <span class="panel">_Specimens_</span>
-panel. Furthermore, this will also expand a sub-group of controls, if
-it is relevant, that allows a user to refine the visualisation. For
-instance, if the plot is a _series_, the sub-group will consists of
-control for showing or hiding circles and polylines. The following
-screen-shot displays all of the data points for both mutant and
-wildtype specimens.
+Checking the _Show both male and female datapoints_ control <img
+src="../resources/images/male_female_on.png"></img> displays all of the data
+points that are associated with all of the specimens listed in the
+<span class="panel">_Specimen and experiment details_</span>
+panel.
 
 ![Visualise all of the data points][both_male_female]
 
-### Filter data points by gender
-
-By checking or unchecking the <span class="control">_Include
-male_</span> and <span class="control">_Include female_</span>
-controls, a user can filter out data points by gender. These are shown
+By checking or unchecking the _Include only male_</span> <img
+src="../resources/images/male_on.png"></img>, or
+_Include only female_ <img
+src="../resources/images/female_on.png"></img> controls,
+a user can filter out data points by gender. These are shown
 below.
 
-![Filter out data points that correspond to female specimens][only_male]
+![Include data points that correspond to male specimens][only_male]
 
-![Filter out data points that correspond to male specimens][only_female]
+![Include data points that correspond to female specimens][only_female]
 
 
 ## Visualising statistical information
 
 The PhenoDCC web application allows a user to visualise statistical
 information about the data points. Statistical visualisation is
-enabled by checking the <span class="control">_Show
-statistics_</span> control. This expands the control subgroup which
-allows a user to select statistical information that they wish to
-visualise.
+enabled by checking the _Show statistics_ control <img
+src="../resources/images/statistics_on.png"></img>. The list of all statistics
+that may be included is listed in the
+[Visualisation control icons](#visualisation-control-icons) section.
 
 ![Statistical visualisation showing 1st and 3rd quartiles][show_1_3_quartiles]
 
 The above screen-shot shows an example statistical visualisation, which
 displays the first and third quartiles for all the data sets (grouped by
-_x_-axis values). Note that we have hidden all of the data points that
-correspond to the highlighted specimen by unchecking the <span
-class="control">_Highlight selected specimen_</span> control.
+_x_-axis values).
 
 It is possible to show, or hide, the data point circles and the series
-polyline by checking, or unchecking, the <span class="control">_Show
-data point_</span> and <span class="control">_Show series
-polyline_</span> respectively. Unlike circles that correspond to data
-points, circles that correspond to statistical information cannot be
-selected; furthermore, hovering over these circles will have no
-effect.
+polyline by checking, or unchecking, the _Show data point_ <img
+src="../resources/images/point_on.png"></img> and _Show series
+polyline_ <img src="../resources/images/polyline_on.png"></img> controls
+respectively.
 
 ### Maxima, minima, mean, median and quartiles
 
@@ -395,9 +379,8 @@ combined visualisation, as shown below.
 A [box-and-whisker plot](http://en.wikipedia.org/wiki/Box_and_whisker_plot)
 allows visualisation of the [quartiles](http://en.wikipedia.org/wiki/Quartile)
 and regions that are either within 1.5 times the inter-quartile
-range (IQR), or the range. This can be enabled by checking the <span
-class="control">_Box-plot with whiskers_</span> control in the
-**Statistics type** section, as shown below.
+range (IQR), or the range. This can be enabled by checking the _Box-plot with
+whiskers_ <img src="../resources/images/whisker_on.png"></img> control.
 
 ![Visualising box and whisker plot][show_box_plot]
 
@@ -409,34 +392,22 @@ extended. These are:
 
 2. Extend 1.5 times the inter-quartile range, in which case the lower
    whisker extends 1.5 x IQR below the first quartile, and the upper
-   whisker extends 1.5 x IQR above the third quartile.
+   whisker extends 1.5 x IQR above the third quartile. To do this, enable
+   the <img src="../resources/images/whisker_iqr_on.png"></img> control.
 
 ![Extends whiskers to cover range][show_box_plot_with_data_points]
 
 ![Extends whiskers to 1.5 x IQR][show_box_plot_iqr]
 
-### Standard error bars
-
-To show [error-bars](http://en.wikipedia.org/wiki/Error_bars) for a
-highlighted data set, check the <span class="control">_Standard error_</span>
-control in the **Statistics type** section. The error bars are visualised as
-one [standard error](http://en.wikipedia.org/wiki/Standard_error) 
-off the data point values.
-
-![Show error-bars with highlighted data set][show_standard_error]
-
 ### Show/hide wildtype statistics
 
-To visualise statistical information that correspond to wildtype (or,
-wild type) data, check the <span class="control">_Show
-wildtype_</span> control in the <span class="control">_Show
-statistics_</span> control subgroup. This will first scale the
-_y_-axis to fit the wildtype data points, and then show the related
-statistical information. For instance, in the following screen-shot,
-we display the arithmetic mean for the mutant data set, as well as the
-arithmetic mean for the corresponding wildtype data-set.
+To show or hide visualisation of wildtype datapoints and their
+corresponding statistical information, enable or disable the
+_Include wildtype_ control <img src="../resources/images/wildtype_on.png">
+</img>. If enabled, this will first scale the _y_-axis to fit the wildtype
+data points, and then show the related statistical information.
 
-![Visualise wildtype statistical information][show_wildtype]
+![Visualisation without wildtype datapoints][show_wildtype]
 
 # Quality control issues
 
@@ -507,8 +478,9 @@ There are various ways for removing data points from a selection.
 3.  To remove multiple data points from an existing selection, we
     again use the box-selector. But first, we must switch the box-selector
     _mode_ from _select mode_ to _unselect mode_. This is done by checking
-    the <span class="control">_Highlight cited data points or
-    selection_</span> control. This will not only switch the selection
+    the _Highlight cited data points or selection_ control
+    <img src="../resources/images/selected_on.png"></img>.
+    This will not only switch the selection
     mode, but will also display only those data points that are
     currently in the selection, making removal of data points easier.
 
@@ -568,8 +540,9 @@ The following are descriptions of the issue statuses:
 To comment on an issue, scroll down the <span
 class="panel">_Actions_</span> panel. At the bottom of the panel,
 there will be a text box and three action buttons <span
-class="button">_Add comment_</span>, <span class="button">_Accept
-issue_</span> and <span class="button">_Mark as resolved_</span>.
+class="button">_Add comment_</span>,
+<span class="button">_Mark as under investigation_</span>
+and <span class="button">_Mark as resolved_</span>.
 
 To add a comment, fill in the details of your comment, and simply
 click the <span class="button">_Add comment_</span> button. As soon as
@@ -578,9 +551,9 @@ class="panel">_Actions_</span> panel.
 
 ![Actions that are applicable to an issue][issue_actions]
 
-To _accept_ an issue, to acknowledge that a fix is currently being
-worked on, fill in the comments, if any, and click on the <span
-class="button">_Accept issue_</span> button.
+To _accept_ an issue for further investigation, and to acknowledge that a
+fix is currently being worked on, fill in the comments, if any, and click
+on the <span class="button">_Mark as under investigation_</span> button.
 
 Finally, to mark an issue as resolved, fill in the comments, if any,
 and click on the <span class="button">_Mark as resolved_</span> button.
@@ -598,6 +571,10 @@ pending QC issues, you must resolve these before you can mark a data
 context as _QC done_. If there are no more unresolved issues, the data
 context will be marked as _QC done_, and the parameter status will
 refresh to reflect this.
+
+If you wish to mark all of the parameters under a procedure as _QC done_,
+click on the <img
+src="../resources/images/mark_qcdonegrp_hover.png"></img> button.
 
 ## Progression of status
 
@@ -671,13 +648,19 @@ as a normal text string, for communication in emails etc.
 ## Data context status (gene/strain, procedure and parameter)
 <table>
 <tbody>
-<tr><td><img src="../resources/images/xmark.png"></img></td><td>Data context has no measurements.</td></tr>
-<tr><td><img src="../resources/images/timeline-adddata.png"></img></td><td>Crawler added new measurements.</td></tr>
-<tr><td><img src="../resources/images/timeline-changedata.png"></img></td><td>Crawler modified existing measurements.</td></tr>
-<tr><td><img src="../resources/images/timeline-removedata.png"></img></td><td>Crawler removed measurements.</td></tr>
-<tr><td><img src="../resources/images/timeline-qcdone.png"></img></td><td>Data context has passed QC.</td></tr>
-<tr><td><img src="../resources/images/timeline-raise.png"></img></td><td>There are unresolved QC issues for this data context.</td></tr>
 <tr><td><img src="../resources/images/required.png" style="float:right"></img></td><td>The parameter is a required parameter.</td></tr>
+<tr><td><img src="../resources/images/nodata.png" style="float:right"></img></td><td>Data context has no measurements.</td></tr>
+<tr><td><img src="../resources/images/dataadded.png" style="float:right"></img></td><td>Crawler added new measurements. In general, this happens when centres have exported data to the DCC.</td></tr>
+<tr><td><img src="../resources/images/datachanged.png" style="float:right"></img></td><td>Crawler modified existing measurements. In general, this happens when centres have exported data to the DCC that modifies existing data.</td></tr>
+<tr><td><img src="../resources/images/dataremoved.png" style="float:right"></img></td><td>Crawler removed measurements. In general, this happens when centres remove data that was exported previously to the DCC.</td></tr>
+<tr><td><img src="../resources/images/qcdone.png" style="float:right"></img></td><td>Data context was looked at by a Wrangler and did not find new issues.</td></tr>
+<tr><td><img src="../resources/images/hasissues.png" style="float:right"></img></td><td>There are unresolved QC issues for this data context.</td></tr>
+<tr><td><img src="../resources/images/dataadded_hasissues.png" style="float:right"></img></td><td>New measurements were added for this parameter; and the parameter still has unresolved issues.</td></tr>
+<tr><td><img src="../resources/images/dataremoved_hasissues.png" style="float:right"></img></td><td>Measurements were removed for this parameter; and the parameter still has unresolved issues.</td></tr>
+<tr><td><img src="../resources/images/datachanged_hasissues.png" style="float:right"></img></td><td>Measurements were modified for this parameter; and the parameter still has unresolved issues.</td></tr>
+<tr><td><img src="../resources/images/qcdone_hasissues.png" style="float:right"></img></td><td>Wrangler has looked at the measurements and did not find new issues; however, the parameter still has unresolved issues.</td></tr>
+<tr><td><img src="../resources/images/redoqc.png" style="float:right"></img></td><td>Wrangler should look at the measurements again. Measurements have been updated since the last time the context was checked.</td></tr>
+<tr><td><img src="../resources/images/redoqc_hasissues.png" style="float:right"></img></td><td>Wrangler should look at the measurements again. The context also has unresolved issues.</td></tr>
 </tbody>
 </table>
 
@@ -707,12 +690,45 @@ as a normal text string, for communication in emails etc.
 </tbody>
 </table>
 
-## Visualisation control
+## Visualisation control icons
+<table>
+<tbody>
+<tr><td><img src="../resources/images/male_female_on.png"></img></td><td>Include or exclude data points by gender.</td></tr>
+<tr><td><img src="../resources/images/male_on.png"></img></td><td>Only include datapoints for male specimens.</td></tr>
+<tr><td><img src="../resources/images/female_on.png"></img></td><td>Only include datapoints for female specimens.</td></tr>
+<tr><td><img src="../resources/images/zygosity_all_on.png"></img></td><td>Include or exclude datapoints by zygosity.</td></tr>
+<tr><td><img src="../resources/images/hom_on.png"></img></td><td>Only include datapoints for homozygous specimens.</td></tr>
+<tr><td><img src="../resources/images/het_on.png"></img></td><td>Only include datapoints for heterozygous specimens.</td></tr>
+<tr><td><img src="../resources/images/hem_on.png"></img></td><td>Only include datapoints for hemizygous specimens.</td></tr>
+<tr><td><img src="../resources/images/polyline_on.png"></img></td><td>Show or hide polylines on series plots.</td></tr>
+<tr><td><img src="../resources/images/point_on.png"></img></td><td>Show or hide data points.</td></tr>
+<tr><td><img src="../resources/images/wildtype_on.png"></img></td><td>Include or exclude wildtype datapoints.</td></tr>
+<tr><td><img src="../resources/images/swarm_on.png"></img></td><td>Enable or disable display of scatter data using Beeswarm plot.</td></tr>
+<tr><td><img src="../resources/images/whisker_on.png"></img></td><td>Show or hide box and whisker plots.</td></tr>
+<tr><td><img src="../resources/images/whisker_iqr_on.png"></img></td><td>Extend whiskers to 1.5 x Inter-Quartile Range. If disabled, the whiskers are extended to the extremas.</td></tr>
+<tr><td><img src="../resources/images/statistics_on.png"></img></td><td>Show or hide descriptive statistics.</td></tr>
+<tr><td><img src="../resources/images/quartile_on.png"></img></td><td>Show or hide 1st and 3rd quartiles.</td></tr>
+<tr><td><img src="../resources/images/min_on.png"></img></td><td>Show or hide minimum value</td></tr>
+<tr><td><img src="../resources/images/max_on.png"></img></td><td>Show or hide maximum value</td></tr>
+<tr><td><img src="../resources/images/mean_on.png"></img></td><td>Show or hide mean</td></tr>
+<tr><td><img src="../resources/images/median_on.png"></img></td><td>Show or hide median</td></tr>
+<tr><td><img src="../resources/images/crosshair_on.png"></img></td><td>Show or hide cross hair.</td></tr>
+<tr><td><img src="../resources/images/errorbar_on.png"></img></td><td>Show or hide standard deviation bars.</td></tr>
+<tr><td><img src="../resources/images/std_err_on.png"></img></td><td>Show or hide standard error bars.</td></tr>
+<tr><td><img src="../resources/images/highlight_on.png"></img></td><td>Highlight data points that correspond to the selected mouse specimen.</td></tr>
+<tr><td><img src="../resources/images/selected_on.png"></img></td><td>Highlight selected data points; or highlight cited data points when issues are selected.</td></tr>
+<tr><td><img src="../resources/images/newdata_on.png"></img></td><td>Display new datapoints added since the last time a Wrangler viewed the measurements (i.e., marked the context as 'QC done').</td></tr>
+</tbody>
+</table>
+
+## Issue management controls
+
 <table>
 <tbody>
 <tr><td><img src="../resources/images/mark_qcdone_hover.png"></img></td><td>Mark data context as QC done.</td></tr>
+<tr><td><img src="../resources/images/mark_qcdonegrp.png"></img></td><td>Mark all parameters of the current procedure as QC done.</td></tr>
 <tr><td><img src="../resources/images/raise_issue_hover.png"></img></td><td>Raise an issue using selected data points.</td></tr>
-<tr><td><img src="../resources/images/clear_selection_hover.png"></img></td><td>Clear the cited data points or selection.</td></tr>
+<tr><td><img src="../resources/images/clear_selection_hover.png"></img></td><td>Clear the cited data points or selection. This icon also displays the number of datapoints currently selected.</td></tr>
 <tr><td><img src="../resources/images/maximise_hover.png"></img></td><td>Maximise the visualisation.</td></tr>
 <tr><td><img src="../resources/images/minimise_hover.png"></img></td><td>Minimise the visualisation.</td></tr>
 </tbody>
@@ -741,7 +757,7 @@ database][mysql], [Sencha ExtJS][extjs] framework,
 
 ***
 
-<div class="footer">Copyright (c) 2013 The International Mouse Phenotyping Consortium</div>
+<div class="footer">Copyright (c) 2014 The International Mouse Phenotyping Consortium</div>
 
 [startup]: images/startup.png "Web application is loading..."
 [loaded]: images/loaded.png "Web application has loaded successfully"

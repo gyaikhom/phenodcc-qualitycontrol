@@ -77,7 +77,7 @@ Ext.define('PhenoDCC.view.AllIssuesPanel', {
             },
             {
                 text: "Last update",
-                dataIndex: "lastupdate",
+                dataIndex: "lastUpdate",
                 flex: 1
             }];
 

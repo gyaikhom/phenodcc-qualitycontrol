@@ -35,7 +35,7 @@ rm -f all-classes.js app-all.js;
 sencha build -p app.jsb3 -d .;
 
 # Prepare the visualisation component
-java -jar viz/yuicompressor-2.4.7.jar -o viz/viz.DCC_QC_VERSION.js viz/viz.js;
+java -jar viz/yuicompressor-2.4.7.jar -o viz/viz.DCC_QC_VERSION.js viz/visualise.js;
 
 # Now combine all of the Javascripts into one application.
 cat viz/d3.v3.min.js viz/viz.DCC_QC_VERSION.js ext-all.js app-all.js > app.DCC_QC_VERSION.js;

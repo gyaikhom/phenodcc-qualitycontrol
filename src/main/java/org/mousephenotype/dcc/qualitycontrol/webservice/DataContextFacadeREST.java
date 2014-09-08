@@ -94,13 +94,11 @@ public class DataContextFacadeREST extends AbstractFacade<DataContext> {
             Integer userId,
             EntityManager em) {
         if (context != null && state != null && actionType != null) {
-            if (context.getNumIssues() == context.getNumResolved()) {
-                em.getTransaction().begin();
-                context.setStateId(state);
-                em.persist(new History(context, userId, actionType,
-                        state, null, null));
-                em.getTransaction().commit();
-            }
+            em.getTransaction().begin();
+            context.setStateId(state);
+            em.persist(new History(context, userId, actionType,
+                    state, null, null));
+            em.getTransaction().commit();
         }
     }
 
@@ -121,9 +119,9 @@ public class DataContextFacadeREST extends AbstractFacade<DataContext> {
         DataContext context = em.find(DataContext.class, contextId);
 
         /* find all of the parameters under procedure defined by the context */
-        TypedQuery<DataContext> q =
-                em.createNamedQuery("DataContext.findByCidLidGidSidPid",
-                DataContext.class);
+        TypedQuery<DataContext> q
+                = em.createNamedQuery("DataContext.findByCidLidGidSidPid",
+                        DataContext.class);
         q.setParameter("cid", context.getCid());
         q.setParameter("lid", context.getLid());
         q.setParameter("gid", context.getGid());
@@ -179,14 +177,14 @@ public class DataContextFacadeREST extends AbstractFacade<DataContext> {
         DataContextPack p = new DataContextPack();
         if (isValidSession(sessionId, userId)) {
             p.setDataSet(null, 0L);
-            if (cid > -1 && lid > -1 && gid > -1 && sid > -1 &&
-                    pid > -1 && qid > -1) {
+            if (cid > -1 && lid > -1 && gid > -1 && sid > -1
+                    && pid > -1 && qid > -1) {
                 EntityManager em = getEntityManager();
                 ACentre centre = em.find(ACentre.class, cid);
                 if (centre != null) {
-                    TypedQuery<DataContext> query =
-                            em.createNamedQuery("DataContext.findByContext",
-                            DataContext.class);
+                    TypedQuery<DataContext> query
+                            = em.createNamedQuery("DataContext.findByContext",
+                                    DataContext.class);
                     query.setParameter("cid", cid);
                     query.setParameter("lid", lid);
                     query.setParameter("gid", gid);
@@ -227,9 +225,9 @@ public class DataContextFacadeREST extends AbstractFacade<DataContext> {
             EntityManager em = getEntityManager();
             DataContext dc = em.find(DataContext.class, contextId);
             if (dc != null) {
-                TypedQuery<HistoryEntry> query =
-                        em.createNamedQuery("History.findByContextId",
-                        HistoryEntry.class);
+                TypedQuery<HistoryEntry> query
+                        = em.createNamedQuery("History.findByContextId",
+                                HistoryEntry.class);
                 query.setParameter("contextId", dc);
                 List<HistoryEntry> entries = query.getResultList();
                 Iterator<HistoryEntry> i = entries.iterator();

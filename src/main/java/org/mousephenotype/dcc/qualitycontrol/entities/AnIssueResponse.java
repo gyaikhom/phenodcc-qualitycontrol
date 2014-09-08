@@ -33,8 +33,9 @@ public class AnIssueResponse implements Serializable {
     private String priority;
     private String status;
     private String raisedBy;
+    private Integer raisedByUid;
     private String assignedTo;
-    private Long lastupdate;
+    private Long lastUpdate;
     private String title;
     private String description;
     private DataContext context;
@@ -48,9 +49,8 @@ public class AnIssueResponse implements Serializable {
 
     public AnIssueResponse(Long id, String title, String description,
             String priority, String status, String raisedBy,
-            String assignedTo, Long lastUpdate,
-            DataContext context,
-            String peid, String procedure,
+            Integer raisedByUid, String assignedTo, Long lastUpdate,
+            DataContext context, String peid, String procedure,
             String qeid, String parameter) {
         this.id = id;
         this.title = title;
@@ -58,8 +58,9 @@ public class AnIssueResponse implements Serializable {
         this.priority = priority;
         this.status = status;
         this.raisedBy = raisedBy;
+        this.raisedByUid = raisedByUid;
         this.assignedTo = assignedTo;
-        this.lastupdate = lastUpdate;
+        this.lastUpdate = lastUpdate;
         this.context = context;
         this.peid = peid;
         this.procedure = procedure;
@@ -115,6 +116,14 @@ public class AnIssueResponse implements Serializable {
         this.raisedBy = raisedBy;
     }
 
+    public Integer getRaisedByUid() {
+        return raisedByUid;
+    }
+
+    public void setRaisedByUid(Integer raisedByUid) {
+        this.raisedByUid = raisedByUid;
+    }
+
     public String getAssignedTo() {
         return assignedTo;
     }
@@ -123,12 +132,12 @@ public class AnIssueResponse implements Serializable {
         this.assignedTo = assignedTo;
     }
 
-    public Long getLastupdate() {
-        return lastupdate;
+    public Long getLastUpdate() {
+        return lastUpdate;
     }
 
-    public void setLastupdate(Long lastupdate) {
-        this.lastupdate = lastupdate;
+    public void setLastUpdate(Long lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
     public DataContext getContext() {
@@ -169,5 +178,6 @@ public class AnIssueResponse implements Serializable {
 
     public void setParameter(String parameter) {
         this.parameter = parameter;
-    }   
+    }
+    
 }

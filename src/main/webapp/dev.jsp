@@ -5,9 +5,10 @@
         <title>PhenoDCC Quality Control Web Application</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+        <link rel="stylesheet" type="text/css" href="/imageviewer/css/imageviewer.css">
         <link rel="stylesheet" type="text/css" href="resources/css/phenodcc.css">
         <link rel="stylesheet" type="text/css" href="resources/css/viz.css">
-        <link href='https://fonts.googleapis.com/css?family=Roboto:300,400' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600' rel='stylesheet' type='text/css'>
     </head>
     <body>
         <!--[if lt IE 9]>
@@ -40,7 +41,8 @@
         </div>
 
         <script type="text/javascript" src="viz/d3.v3.min.js"></script>
-        <script type="text/javascript" src="viz/viz.js"></script>
+        <script type="text/javascript" src="/imageviewer/js/imageviewer.js"></script>
+        <script type="text/javascript" src="viz/visualise.js"></script>
         <script type="text/javascript" src="extjs/ext-debug.js"></script>
         <script type="text/javascript" src="app.js"></script>
 
@@ -88,15 +90,10 @@
                 dcc.allissuesFilter = parseInt('<%= request.getParameter("if")%>');
                 if (isNaN(dcc.allissuesFilter))  dcc.allissuesFilter = 63;
 
-                /* pass control settings */
-                dcc.control_options = {
-                    'series': parseInt('<%= request.getParameter("sctrl")%>'),
-                    'point': parseInt('<%= request.getParameter("pctrl")%>')
-                }
-                if (isNaN(dcc.control_options.series)
-                    && isNaN(dcc.control_options.point))
-                    dcc.control_options = null;
-            })
+                var ctrl = parseInt('<%= request.getParameter("ctrl")%>');
+                if (!isNaN(ctrl))
+                    dcc.visualisationControl = ctrl;
+            });
         </script>
     </body>
 </html>

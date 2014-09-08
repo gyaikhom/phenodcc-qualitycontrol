@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import org.mousephenotype.dcc.crawler.entities.XmlFile;
 import org.mousephenotype.dcc.entities.overviews.MeasuredValues;
 import org.mousephenotype.dcc.entities.overviews.ProcedureAnimalOverview;
 import org.mousephenotype.dcc.qualitycontrol.webservice.pack.MeasurementsPack;
@@ -45,10 +46,10 @@ public class MeasurementsFacadeREST extends AbstractFacade<MeasuredValues> {
             String procedureKey,
             String parameterKey) {
         EntityManager em = getEntityManager();
-        TypedQuery<MeasuredValues> query =
-                em.createNamedQuery(
-                "MeasurementsPerformed.findMutantMeasurements",
-                MeasuredValues.class);
+        TypedQuery<MeasuredValues> query
+                = em.createNamedQuery(
+                        "MeasurementsPerformed.findMutantMeasurements",
+                        MeasuredValues.class);
         query.setParameter("centreId", centreId);
         query.setParameter("pipelineId", pipelineId);
         query.setParameter("genotypeId", genotypeId);
@@ -56,25 +57,38 @@ public class MeasurementsFacadeREST extends AbstractFacade<MeasuredValues> {
         query.setParameter("procedureKey", procedureKey);
         query.setParameter("parameterKey", parameterKey);
         List<MeasuredValues> temp = query.getResultList();
+        for (MeasuredValues m : temp) {
+            XmlFile xf = em.find(XmlFile.class, m.getTrackerId());
+            if (xf != null) {
+                m.setLastModified(xf.getLastUpdate());
+            }
+        }
         em.close();
         return temp;
     }
 
     private List<MeasuredValues> getBaselineMeasurements(
             ProcedureAnimalOverview pao,
+            String procedureKey,
             String parameterKey) {
         EntityManager em = getEntityManager();
-        TypedQuery<MeasuredValues> query =
-                em.createNamedQuery(
-                "MeasurementsPerformed.findBaselineMeasurements",
-                MeasuredValues.class);
+        TypedQuery<MeasuredValues> query
+                = em.createNamedQuery(
+                        "MeasurementsPerformed.findBaselineMeasurements",
+                        MeasuredValues.class);
         query.setParameter("centreId", pao.getCentreId());
         query.setParameter("pipeline", pao.getPipeline());
         query.setParameter("strainId", pao.getStrainId());
-        query.setParameter("procedureId", pao.getProcedureId());
+        query.setParameter("procedureId", procedureKey);
         query.setParameter("parameterId", parameterKey);
         query.setParameter("metadataGroup", pao.getMetadataGroup());
         List<MeasuredValues> temp = query.getResultList();
+        for (MeasuredValues m : temp) {
+            XmlFile xf = em.find(XmlFile.class, m.getTrackerId());
+            if (xf != null) {
+                m.setLastModified(xf.getLastUpdate());
+            }
+        }
         em.close();
         return temp;
     }
@@ -84,9 +98,9 @@ public class MeasurementsFacadeREST extends AbstractFacade<MeasuredValues> {
             Integer strainId, String parameterId) {
         ProcedureAnimalOverview pao = null;
         EntityManager em = getEntityManager();
-        TypedQuery<ProcedureAnimalOverview> q =
-                em.createNamedQuery("ProcedureAnimalOverview.findByCidLidGidSidQeid",
-                ProcedureAnimalOverview.class);
+        TypedQuery<ProcedureAnimalOverview> q
+                = em.createNamedQuery("ProcedureAnimalOverview.findByCidLidGidSidQeid",
+                        ProcedureAnimalOverview.class);
         q.setParameter("centreId", centreId);
         q.setParameter("pipelineId", pipelineId);
         q.setParameter("genotypeId", genotypeId);
@@ -122,17 +136,17 @@ public class MeasurementsFacadeREST extends AbstractFacade<MeasuredValues> {
                     || parameterKey == null || parameterKey.isEmpty()) {
                 p.setDataSet(null, 0L);
             } else {
-                ProcedureAnimalOverview pao =
-                        getProcedureAnimalOverview(centreId, pipelineId,
-                        genotypeId, strainId, parameterKey);
+                ProcedureAnimalOverview pao
+                        = getProcedureAnimalOverview(centreId, pipelineId,
+                                genotypeId, strainId, parameterKey);
                 if (pao == null) {
                     p.setDataSet(null, 0L);
                 } else {
-                    List<MeasuredValues> temp =
-                            getMutantMeasurements(centreId, pipelineId,
-                            genotypeId, strainId, procedureKey, parameterKey);
+                    List<MeasuredValues> temp
+                            = getMutantMeasurements(centreId, pipelineId,
+                                    genotypeId, strainId, procedureKey, parameterKey);
                     if (genotypeId != 0 && includeBaseline != null && includeBaseline) {
-                        temp.addAll(getBaselineMeasurements(pao, parameterKey));
+                        temp.addAll(getBaselineMeasurements(pao, procedureKey, parameterKey));
                     }
                     p.setDataSet(temp);
                 }

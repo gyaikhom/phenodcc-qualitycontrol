@@ -57,6 +57,10 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             selector: '#data-view-issues-panel'
         },
         {
+            ref: 'issueMessagesPanel',
+            selector: '#issue-messages-panel'
+        },
+        {
             ref: 'actionsPanel',
             selector: '#data-view-actions-panel'
         },
@@ -148,11 +152,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                 '#data-view-overall-tab': {
                     activate: this.onOverallTabActivate
                 },
-                '#specimen-centric-visualisation-container': {
-                    resize: this.onSpecimenCentricVisualResize
-                },
                 '#all-issues-tab': {
-                    activate: this.loadAllIssues
+                    activate: function() {
+                        if (!dcc.allIssuesAlreadyLoaded)
+                            this.loadAllIssues();
+                    }
                 },
                 '#all-issues-panel': {
                     selectionchange: this.setContextAndShowIssue
@@ -196,10 +200,6 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         );
     },
     ptype: {},
-    onSpecimenCentricVisualResize: function() {
-        var me = this;
-        me.loadMeasurements();
-    },
     setExtraParams: function(proxy) {
         if (proxy !== null) {
             proxy.extraParams.cid = dcc.dataContext.cid; /* centre */
@@ -247,6 +247,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     },
     setCentre: function(cid) {
         dcc.dataContext.cid = cid;
+        dcc.allIssuesAlreadyLoaded = null;
         this.application.fireEvent("centrechange");
     },
     setPipeline: function(lid) {
@@ -267,6 +268,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         this.application.fireEvent("procedurechange");
     },
     setContextId: function() {
+        dcc.imageViewer = null;
         var me = this, store = me.getDataContextsStore();
         if (store !== null) {
             me.setExtraParams(store.getProxy());
@@ -333,23 +335,19 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     setContextAndShowIssue: function(selModel, selection) {
         if (selection !== null && selection.length > 0) {
             var me = this, tab, s = selection[0], context = s.get('context');
-            if (context.numMeasurements === 0) {
-                alert('All of the measurements have been removed since this issue was raised.');
-            } else {
-                tab = me.getQcSummaryIssuesTabpanel();
-                tab.setActiveTab(0);
-                tab = me.getIssueSpecimenHistoryTab();
-                tab.setActiveTab(0);
-                dcc.dataContext.lid = context.lid;
-                dcc.dataContext.gid = context.gid;
-                dcc.dataContext.sid = context.sid;
-                dcc.dataContext.pid = context.pid;
-                dcc.dataContext.qid = context.qid;
-                dcc.dataContext.peid = s.get('peid');
-                dcc.dataContext.qeid = s.get('qeid');
-                dcc.dataContext.iid = s.get('id');
-                me.loadPipelines();
-            }
+            tab = me.getQcSummaryIssuesTabpanel();
+            tab.setActiveTab(0);
+            tab = me.getIssueSpecimenHistoryTab();
+            tab.setActiveTab(0);
+            dcc.dataContext.lid = context.lid;
+            dcc.dataContext.gid = context.gid;
+            dcc.dataContext.sid = context.sid;
+            dcc.dataContext.pid = context.pid;
+            dcc.dataContext.qid = context.qid;
+            dcc.dataContext.peid = s.get('peid');
+            dcc.dataContext.qeid = s.get('qeid');
+            dcc.dataContext.iid = s.get('id');
+            me.loadPipelines();
         }
     },
     reloadIssues: function(tab) {
@@ -407,6 +405,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                 me.abortPending(store);
                 store.load({
                     callback: function() {
+                        dcc.allIssuesAlreadyLoaded = true;
                     },
                     scope: this
                 });
@@ -428,8 +427,10 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     onSpecimenChange: function() {
     },
     onParameterChange: function() {
-        var me = this;
+        var me = this, temp;
         me.setContextId();
+        temp = me.getIssueMessagesPanel();
+        temp.update('');
         me.reloadMeasurements();
         me.reloadIssues();
     },
@@ -586,6 +587,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         d.detailEl.hide().update(detail).slideIn('t', {
             duration: 200
         });
+
+        d3.select('#context-details-genesymbol').text(data['geneSymbol']);
+        d3.select('#context-details-genotype').text(data['genotype']);
+        d3.select('#context-details-allele').html(data['alleleName']);
+        d3.select('#context-details-strain').text(data['strain']);
     },
     /**
      * Function onGeneAlleleStrainSelect() is an event handler which is
@@ -614,6 +620,12 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             }
         }
     },
+    clearGeneContextDetails: function() {
+        d3.select('#context-details-genesymbol').text('');
+        d3.select('#context-details-genotype').text('');
+        d3.select('#context-details-allele').html('');
+        d3.select('#context-details-strain').text('');
+    },
     /**
      * Function updateDetail() updates the content of the gene details panel.
      */
@@ -625,9 +637,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         d.detailEl.update("<div class='select-gene-for-details'>" + content + "</div>");
     },
     setDefaultDetail: function() {
+        this.clearGeneContextDetails();
         this.updateDetails("Select a background strain to get additional details.");
     },
     setEmptyTree: function() {
+        this.clearGeneContextDetails();
         this.updateDetails("Did not find genotype/background strain with data for the selected centre and pipeline.");
     },
     /**
@@ -740,6 +754,31 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         return tree;
     },
     /**
+     * The store contains a flat record structure, from which we group genes
+     * under the same strain. To find the index in the tree panel, we have to
+     * count all of the strains until we find the correct record.
+     */
+    getGeneStrainTreeIndex: function(store) {
+        var i, c, index = 0, sid = -1, record, found = false;
+        for (i = 0, c = store.getCount(); i < c; ++i) {
+            record = store.getAt(i);
+            /* does this record correspond to the
+             * beginning of a strain expander? */
+            if (sid !== record.get('sid')) {
+                sid = record.get('sid');
+                ++index; /* one tree expander found */
+            }
+            /* have we found the right genotype and strain? */
+            if (sid === dcc.dataContext.sid
+                && record.get('gid') === dcc.dataContext.gid) {
+                found = true;
+                break;
+            }
+            ++index;
+        }
+        return found ? index : -1;
+    },
+    /**
      * Function showTree() first generates a hierarchical tree data structure
      * for a list of genes and strains information that has been grouped using
      * the allele name. This tree data structure is then used to initialise
@@ -770,11 +809,10 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             if (geneStrainRecordIndex === -1) {
                 this.setDefaultDetail();
             } else {
-                var record = store.getAt(geneStrainRecordIndex);
-                searchBox.setValue(record.data.geneSymbol);
-                var geneIndex = store.find('gid', record.get('gid'));
+                treePanel.expandAll();
+                var geneIndex = this.getGeneStrainTreeIndex(store);
                 var selModel = treePanel.getSelectionModel();
-                selModel.select(geneIndex + 1);
+                selModel.select(geneIndex);
             }
         }
         treePanel.setLoading(false);
@@ -863,7 +901,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         var store = panel.getStore();
         store.removeAll();
         return store;
-    },        
+    },
     findNextProcedure: function(store) {
         var next = store.findBy(function(record, id) {
             var stateId = record.get('s');
@@ -1010,6 +1048,21 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             });
         }
     },
+    /* The procedure specimens tab contains a text field where users can
+     * type part of the specimen name. This is used to filter out the
+     * procedure/specimen list.
+     */
+    searchForSpecimen: function() {
+        var me = this, store = me.getProcedureSpecimensStore(), proxy;
+        if (store !== null) {
+            proxy = store.getProxy();
+            if (proxy !== null) {
+                proxy.extraParams.q = dcc.specimenSearchQuery;
+                Ext.getCmp('procedure-specimens-pager').moveFirst();
+                me.loadProcedureSpecimens();
+            }
+        }
+    },
     /**
      * Function loadProcedureSpecimen() loads all of the specimens on
      * which the procedure specified in the data context was applied. The
@@ -1055,23 +1108,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      */
     loadMeasurements: function() {
         var me = this, chart = me.getSpecimenCentricVisualisationContainer(),
-            store = me.getMeasurementsStore(),
             node = d3.select('#specimen-centric-visualisation');
-
         node.selectAll('*').remove();
-        node.attr('class', 'loading').text('');
         if (me.isValidDataContext() && me.isValidMeasurementsContext()) {
-            me.abortPending(store);
-            store.load({
-                callback: function() {
-                    d3.select('#specimen-centric-visualisation')
-                        .classed('loading', false);
-                    me.enableChart(chart);
-                    dcc.visualise('specimen', me.ptype,
-                        store, "#specimen-centric-visualisation");
-                },
-                scope: this
-            });
+            me.enableChart(chart);
+            dcc.visualise(me.ptype, "#specimen-centric-visualisation");
         } else {
             me.disableChart(chart);
         }
@@ -1101,13 +1142,14 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                 if (store.getCount() > 0) {
                     me.selectOrDisable(panel, 6);
                 } else {
-                    var viz = dcc.viz['specimen'];
+                    var viz = dcc.viz;
                     if (viz)
                         viz.state.q = {};
                     panel.setLoading(false);
                     var actionsPanel = me.getActionsPanel();
                     if (actionsPanel) {
                         actionsPanel.update('<div class="no-issues">Current data context does not have any Quality Control issues</div>');
+                        dcc.dataContext.iid = null;
                     }
                 }
             },
@@ -1140,133 +1182,157 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     },
     onSpecimenSelect: function(selModel, selection) {
         if (selection !== null && selection.length > 0) {
-            var animalId = selection[0].get('ai'),
-                viz = dcc.getVisualisation('specimen');
+            var animalId = selection[0].get('ai');
             this.setSpecimen(animalId);
-            if (viz) {
-                viz.state.h = animalId;
-                viz.refresh();
-            }
+            dcc.selectSpecimen(animalId);
         }
     },
     onCentreSelect: function(combo, centreId) {
-        if (centreId !== null)
+        var node = d3.select('#context-details-centre');
+        if (centreId === null)
+            node.text('');
+        else {
+            node.text(combo.getRawValue());
             this.setCentre(centreId);
-    },
-    onPipelineSelect: function(combo, pipelineId) {
-        if (pipelineId !== null)
-            this.setPipeline(pipelineId);
-    },
-    /**
-     * When an issue is selected from the issues panel, the server also returns
-     * a set of data points that are associated with the issue. Since the issue
-     * is defined in the curren data context, the data points currently
-     * displayed in the visualisation already includes the issue data points. To
-     * highlight these, we only need to replace the current selection with the
-     * set of issue data points, and then refresh the visualisation.
-     *
-     * @param {Array} issueDatapoints Data points associated with an issue.
-     */
-    highlightIssueDatapoints: function(issueDatapoints) {
-        var viz = dcc.viz['specimen'];
-        if (viz) {
-            var i, citedDatapoints = issueDatapoints.citeddatapoints,
-                c = citedDatapoints.length, t;
-            viz.state.q = {};
-            viz.state.numFoundCited = issueDatapoints.total;
-            viz.state.numInitiallyCited = issueDatapoints.count;
-            for (i = 0; i < c; ++i) {
-                t = citedDatapoints[i];
-                viz.state.q[t.m] = {
-                    a: t.a,
-                    m: t.m,
-                    x: t.x,
-                    y: t.y
-                };
-            }
-            viz.refresh();
         }
     },
+    onPipelineSelect: function(combo, pipelineId) {
+        var node = d3.select('#context-details-pipeline');
+        if (pipelineId === null)
+            node.text('');
+        else {
+            node.text(combo.getRawValue());
+            this.setPipeline(pipelineId);
+        }
+    },
+    /* @TODO Should handle this properly using document fragments. */
     prepareActions: function(store, status) {
-        var content = "<div class='actions-container'>", count = 0;
+        var content = "<div id='actions-container'>", count = 0, text,
+            markForInvestigation = false;
         store.each(function(record) {
+            if (record.get('actionType') === 'accept')
+                markForInvestigation = true;
+            text = record.get('description')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/\n\n/g, "</p><br><p>")
+                .replace(/\n/g, "</p><p>");
             content += "<div class='action-entry-" + (++count % 2 ? "odd" : "even") +
                 "'><div class='action-title'>" +
                 "<span class='actionedon'>" + record.get('lastUpdate') +
                 "</span><span class='actionedby'>" + record.get('actionedBy') +
                 "</span></div><div class='action-description'><p>" +
-                record.get('description')
-                .replace(/\n\n/g, "</p><br><p>")
-                .replace(/\n/g, "</p><p>") +
-                "</p></div></div>";
+                text + "</p></div></div>";
         });
-        if (dcc.roles.uid !== 0 && status !== 'resolved') {
+
+        if (status !== 'resolved') {
             content += '<textarea id="action-detail" class="form-textarea" ' +
                 'rows=10 cols=80 placeholder="Provide details for one of the following actions.">' +
                 '</textarea><div id="action-buttons" class="form-button-group">' +
                 '<div id="add-comment" class="button">Add comment</div>';
-            if (status !== 'accepted')
+            if (!markForInvestigation)
                 content += '<div id="accept-issue" class="button">Mark as under investigation</div>';
             content += '<div id="resolve-issue" class="button">Mark as resolved</div>' +
                 '</div><div></div>';
         }
+
+        if (dcc.roles.uid === dcc.dataContext.raisedByUid) {
+            content += '<div id="delete-issue" class="button">Delete issue</div></div><div></div>';
+        }
         return content + "</div>";
+    },
+    deleteIssueHandler: function(issueId) {
+        var me = this;
+        d3.select('#delete-issue')
+            .attr('title', 'Click here to delete this issue \nand related actions forever')
+            .on('click', function() {
+                if (dcc.isQcUser('delete this issue.')) {
+                    if (dcc.roles.uid === dcc.dataContext.raisedByUid) {
+                        if (window.confirm("Are you sure you wish to delete this issue?")) {
+                            var d = document.getElementById('action-detail'),
+                                action = new Ext.create('PhenoDCC.model.Action', {
+                                    "description": 'Delete issue',
+                                    "issueId": issueId,
+                                    "actionedBy": dcc.roles.uid,
+                                    "actionType": 11 /* cid for delete action in phenodcc_qc.action_type */
+                                });
+                            action.save({
+                                callback: function() {
+                                    me.onPipelineChange();
+                                }
+                            });
+                        }
+                    } else
+                        alert('Sorry, issues can only be deleted by the user who raised it');
+                }
+            });
     },
     addCommentHandler: function(issueId) {
         var me = this;
         d3.select('#add-comment')
+            .attr('title', 'Click here to leave the above text \nas a comment on this issue')
             .on('click', function() {
-            var d = document.getElementById('action-detail'),
-                action = new Ext.create('PhenoDCC.model.Action', {
-                "description": d.value,
-                "issueId": issueId,
-                "actionedBy": dcc.roles.uid,
-                "actionType": 1 /* cid for comment in phenodcc_qc.action_type */
-            });
-            action.save({
-                callback: function() {
-                    me.onPipelineChange();
+                if (dcc.isQcUser('comment on this issue.')) {
+                    var d = document.getElementById('action-detail'),
+                        action = new Ext.create('PhenoDCC.model.Action', {
+                            "description": d.value,
+                            "issueId": issueId,
+                            "actionedBy": dcc.roles.uid,
+                            "actionType": 1 /* cid for comment in phenodcc_qc.action_type */
+                        });
+                    action.save({
+                        callback: function() {
+                            me.onPipelineChange();
+                        }
+                    });
                 }
             });
-        });
     },
     acceptIssueHandler: function(issueId) {
         var me = this;
         d3.select('#accept-issue')
+            .attr('title', 'Click here to leave the above text as notification \nthat the issue is being looked at')
             .on('click', function() {
-            var d = document.getElementById('action-detail').value,
-                action = new Ext.create('PhenoDCC.model.Action', {
-                "description": d ? d : 'Issue has been accepted for resolution.',
-                "issueId": issueId,
-                "actionedBy": dcc.roles.uid,
-                "actionType": 2, /* cid for accept in phenodcc_qc.action_type */
-                "lastUpdate": 0 /* doesn't matter: supplied by server */
-            });
-            action.save({
-                callback: function() {
-                    me.onPipelineChange();
+                if (dcc.isQcUser('mark this issue as accepted for investigation.')) {
+                    var d = document.getElementById('action-detail').value,
+                        action = new Ext.create('PhenoDCC.model.Action', {
+                            "description": d ? d : 'Issue has been accepted for resolution.',
+                            "issueId": issueId,
+                            "actionedBy": dcc.roles.uid,
+                            "actionType": 2, /* cid for accept in phenodcc_qc.action_type */
+                            "lastUpdate": 0 /* doesn't matter: supplied by server */
+                        });
+                    action.save({
+                        callback: function() {
+                            me.onPipelineChange();
+                        }
+                    });
                 }
             });
-        });
     },
     resolveIssueHandler: function(issueId) {
         var me = this;
         d3.select('#resolve-issue')
+            .attr('title', 'Click here to mark this issue as resolved \nand leave the above text as description')
             .on('click', function() {
-            var d = document.getElementById('action-detail').value,
-                action = new Ext.create('PhenoDCC.model.Action', {
-                "description": d ? d : 'Issue is now resolved and closed.',
-                "issueId": issueId,
-                "actionedBy": dcc.roles.uid,
-                "actionType": 4, /* cid for resolve in phenodcc_qc.action_type */
-                "lastUpdate": 0 /* doesn't matter: supplied by server */
-            });
-            action.save({
-                callback: function() {
-                    me.onPipelineChange();
+                if (dcc.isQcUser('resolve this issue.')) {
+                    var d = document.getElementById('action-detail').value,
+                        action = new Ext.create('PhenoDCC.model.Action', {
+                            "description": d ? d : 'Issue is now resolved and closed.',
+                            "issueId": issueId,
+                            "actionedBy": dcc.roles.uid,
+                            "actionType": 4, /* cid for resolve in phenodcc_qc.action_type */
+                            "lastUpdate": 0 /* doesn't matter: supplied by server */
+                        });
+                    action.save({
+                        callback: function() {
+                            me.onPipelineChange();
+                        }
+                    });
                 }
             });
-        });
     },
     displayIssueActions: function(issueId, status) {
         var me = this, actionsStore = me.getActionsStore();
@@ -1286,6 +1352,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                                 me.acceptIssueHandler(issueId);
                                 me.resolveIssueHandler(issueId);
                             }
+                            me.deleteIssueHandler(issueId);
                         }
                     }
                 });
@@ -1294,20 +1361,13 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     },
     onIssueSelect: function(selModel, selection) {
         var me = this;
+        dcc.dataContext.raisedByUid = null;
         if (selection !== null && selection.length > 0) {
             var issue = selection[0];
+            dcc.dataContext.raisedByUid = issue.get('raisedByUid');
             dcc.dataContext.iid = issue.get('id');
             me.displayIssueActions(issue.get('id'), issue.get('status'));
-            if (dcc.citedDataPointsReq)
-                dcc.citedDataPointsReq.abort();
-            dcc.citedDataPointsReq =
-                d3.json('rest/citeddatapoints/' + dcc.dataContext.iid
-                + '?u=' + dcc.roles.uid
-                + '&s=' + dcc.roles.ssid,
-                function(data) {
-                    if (data)
-                        me.highlightIssueDatapoints(data);
-                });
+            dcc.loadCitedDatapoints();
         }
     },
     displayHistory: function() {
@@ -1316,6 +1376,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             this.getHistoryPanel().update('<div class="no-issues">Current data context does not yet have a history</div>');
         } else {
             this.getHistoryPanel().update();
+            dcc.lastQcDone = undefined;
             d3.json('rest/history/' + dcc.dataContext.id
                 + '?u=' + dcc.roles.uid
                 + '&s=' + dcc.roles.ssid,
@@ -1337,8 +1398,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             + "&qid=" + context.qid
             + "&peid=" + context.peid
             + "&qeid=" + context.qeid
-            + "&sctrl=" + dcc.control_options.series
-            + "&pctrl=" + dcc.control_options.point;
+            + "&ctrl=" + dcc.visualisationControl;
     },
     /**
      * Generates a bookmark link that contains centre, genotype, strain,
@@ -1371,12 +1431,25 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         }
         return false;
     },
+    attachResizeHandler: function() {
+        var me = this, chart = me.getSpecimenCentricVisualisationContainer();
+        chart.on('resize', dcc.loadMeasurements);
+    },
+    detachResizeHandler: function() {
+        var me = this, chart = me.getSpecimenCentricVisualisationContainer();
+        chart.un('resize', dcc.loadMeasurements);
+    },
     /**
      * Function onLaunch() is invoked when the web application is loaded, after
      * the components have been initialised.
      */
     onLaunch: function() {
-        var me = this;
+        var me = this, temp, contextDetails;
+
+        dcc.loadMeasurements = function() {
+            me.loadMeasurements();
+        };
+        me.attachResizeHandler();
         me.loadCentres();
 
         /* we maintain a reference to this controller for access from outside */
@@ -1386,6 +1459,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         /* get the user roles */
         if (dcc.roles) {
             dcc.roles.qc = me.isQualityControlUser(dcc.roles.roles);
+            dcc.roles.uid = Number(dcc.roles.uid);
 
             /* prepare toolbar */
             var context = dcc.dataContext, toolbar = '<div class="maintoolbar"><a id="reporting-link" href="../phenodcc-summary">Reporting</a><div class="separator"></div><a id="tracker-link" href="../tracker">Tracker</a><div class="separator"></div><a href="/impress" target="_blank">IMPReSS</a><div class="separator"></div><a href="manual.html" target="_blank">Help</a><div class="separator"></div><a id="bookmark-this">Bookmark</a></div>';
@@ -1394,7 +1468,17 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             } else {
                 toolbar += '<div class="user-loggedin"><span id="ctx-user">' + dcc.roles.name + '</span><a href="../user/logout?current=user/' + dcc.roles.uid + '">sign out</a></div>';
             }
-            d3.select('#maintoolbar').html(toolbar);
+            temp = d3.select('#maintoolbar');
+            temp.html(toolbar);
+
+            /* for displaying gene selection details when visualisatin is maximised */
+            contextDetails = temp.append('div').attr('id', 'context-details');
+            contextDetails.append('div').attr('id', 'context-details-centre');
+            contextDetails.append('div').attr('id', 'context-details-pipeline');
+            contextDetails.append('div').attr('id', 'context-details-genotype');
+            contextDetails.append('div').attr('id', 'context-details-allele');
+            contextDetails.append('div').attr('id', 'context-details-strain');
+
             d3.select('#bookmark-this').on('click', function() {
                 me.showBookmark();
             });

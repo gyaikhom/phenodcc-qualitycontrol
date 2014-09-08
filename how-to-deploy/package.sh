@@ -20,6 +20,7 @@
 
 current_dir=`pwd`;
 
+# http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 SOURCE="${BASH_SOURCE[0]}"
 DIR="$( dirname "$SOURCE" )"
 while [ -h "$SOURCE" ]
@@ -80,17 +81,17 @@ case `uname -s` in
     Darwin)
         sed -i "" "s/DCC_QC_VERSION/${version}/g" src/main/webapp/deploy.sh;
         sed -i "" "s/DCC_QC_VERSION/${version}/g" src/main/webapp/index.jsp;
-        sed -i "" "s/DCC_QC_VERSION/${version}/g" src/main/webapp/viz/viz.js;
+        sed -i "" "s/DCC_QC_VERSION/${version}/g" src/main/webapp/viz/visualise.js;
         ;;
     *)
         sed -i "s/DCC_QC_VERSION/${version}/g" src/main/webapp/deploy.sh;
         sed -i "s/DCC_QC_VERSION/${version}/g" src/main/webapp/index.jsp;
-        sed -i "s/DCC_QC_VERSION/${version}/g" src/main/webapp/viz/viz.js;
+        sed -i "s/DCC_QC_VERSION/${version}/g" src/main/webapp/viz/visualise.js;
         ;;
 esac
 
 echo "Cleaning project and remove unnecessary files and directories...";
-mvn clean;
+mvn -q clean;
 rm -Rf .git;
 rm -Rf how-to-deploy nbactions.xml nb-configuration.xml README;
 rm -f src/main/resources/*.{sh,sql};
@@ -102,10 +103,10 @@ cd src/main/webapp;
 echo "Cleaning web app...";
 rm -f all-classes.js app.jsb3 deploy.sh dev.jsp dev.html;
 rm -Rf app resources/sass;
-rm -f resources/css/viz.css viz/viz.js viz/yuicompressor-2.4.7.jar;
-find src/main/webapp/resources/images -type f -iname "*.svg" -delete;
+rm -f resources/css/viz.css viz/visualise.js viz/yuicompressor-2.4.7.jar;
+find resources/images -type f -iname "*.svg" -delete;
 
-echo "Building war...";
+echo "Build war...";
 cd ${current_dir}/${project};
 mvn -q -DskipTests -P $2 package;
 

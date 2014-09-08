@@ -36,6 +36,7 @@ import javax.ws.rs.core.MediaType;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.eclipse.persistence.exceptions.DatabaseException;
 import org.mousephenotype.dcc.qualitycontrol.entities.AnIssueRequest;
 import org.mousephenotype.dcc.qualitycontrol.entities.AnIssueResponse;
 import org.mousephenotype.dcc.entities.impress.Parameter;
@@ -97,9 +98,9 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
             Integer measurementId, DataContext context) {
         EntityManager em = getEntityManager();
         Parameter p = em.find(Parameter.class, context.getQid());
-        TypedQuery<MeasurementsPerformed> query =
-                em.createNamedQuery("MeasurementsPerformed.findByMeasurementIdContext",
-                MeasurementsPerformed.class);
+        TypedQuery<MeasurementsPerformed> query
+                = em.createNamedQuery("MeasurementsPerformed.findByMeasurementIdContext",
+                        MeasurementsPerformed.class);
         query.setParameter("measurementId", measurementId);
         query.setParameter(CID, context.getCid());
         query.setParameter(GID, context.getGid());
@@ -120,55 +121,61 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
 
     @POST
     @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public void createIssue(AnIssueRequest entity,
+    public AnIssue createIssue(AnIssueRequest entity,
             @PathParam("id") Long contextId,
             @QueryParam("s") String sessionId,
             @QueryParam("u") Integer userId) {
-        if (!isValidSession(sessionId, userId)) {
-            return;
-        }
+        AnIssue issue;
+        if (isValidSession(sessionId, userId)) {
+            EntityManager em = getEntityManager();
+            issue = entity.getIssue(em);
+            AnAction action = entity.getAction(em);
+            DataContext context = issue.getContextId();
+            AState newState = getState(em, HAS_ISSUES);
 
-        EntityManager em = getEntityManager();
-        AnIssue issue = entity.getIssue(em);
-        AnAction action = entity.getAction(em);
-        DataContext context = issue.getContextId();
-        AState newState = getState(em, HAS_ISSUES);
-
-        em.getTransaction().begin();
-        context.setNumIssues(context.getNumIssues() + 1);
-        em.persist(issue);
-        em.flush();
-        em.refresh(issue);
-        action.setIssueId(issue);
-        em.persist(action);
-        em.flush();
-        em.refresh(action);
-        em.persist(new History(context, userId, action.getActionType(),
-                newState, action, issue));
-
-        Integer[] measurementIds = entity.getDatapoints();
-        if (measurementIds != null && measurementIds.length > 0) {
-            for (int i = 0, c = measurementIds.length; i < c; ++i) {
-                MeasurementsPerformed m =
-                        getMeasurementPerformed(measurementIds[i], context);
-                CitedDataPoint d =
-                        new CitedDataPoint(issue, m.getMeasurementId(), m.getAnimalId());
-                em.persist(d);
+            try {
+                em.getTransaction().begin();
+                context.setNumIssues(context.getNumIssues() + 1);
+                em.persist(issue);
                 em.flush();
-                em.refresh(d);
-            }
-        }
+                em.refresh(issue);
+                action.setIssueId(issue);
+                em.persist(action);
+                em.flush();
+                em.refresh(action);
+                em.persist(new History(context, userId, action.getActionType(),
+                        newState, action, issue));
 
-        em.getTransaction().commit();
-        em.close();
+                Integer[] measurementIds = entity.getDatapoints();
+                if (measurementIds != null && measurementIds.length > 0) {
+                    for (int i = 0, c = measurementIds.length; i < c; ++i) {
+                        MeasurementsPerformed m
+                                = getMeasurementPerformed(measurementIds[i], context);
+                        CitedDataPoint d
+                                = new CitedDataPoint(issue, m.getMeasurementId(), m.getAnimalId());
+                        em.persist(d);
+                        em.flush();
+                        em.refresh(d);
+                    }
+                }
+                em.getTransaction().commit();
+            } catch (DatabaseException e) {
+                issue = null;
+            }
+            em.close();
+        } else {
+            issue = null;
+        }
+        return issue;
     }
 
     private Integer getAnimalId(EntityManager em, Long measurementId) {
         Integer animalId = 0;
-        TypedQuery<MeasurementsPerformed> q =
-                em.createNamedQuery("MeasurementsPerformed.findByMeasurementId",
-                MeasurementsPerformed.class);
+        TypedQuery<MeasurementsPerformed> q
+                = em.createNamedQuery("MeasurementsPerformed.findByMeasurementId",
+                        MeasurementsPerformed.class);
         q.setParameter("measurementId", measurementId);
         q.setMaxResults(1);
         try {
@@ -218,9 +225,9 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
         AnIssueResponse r = null;
         EntityManager em = getEntityManager();
         if (issue != null) {
-            TypedQuery<AnAction> actionQuery =
-                    em.createNamedQuery("AnAction.findByIssueId",
-                    AnAction.class);
+            TypedQuery<AnAction> actionQuery
+                    = em.createNamedQuery("AnAction.findByIssueId",
+                            AnAction.class);
             actionQuery.setParameter("issueId", issue);
             List<AnAction> actions = actionQuery.getResultList();
             AnAction action = actions.get(0);
@@ -238,7 +245,8 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
                         issue.getId(), issue.getTitle(),
                         action.getDescription(), issue.getPriorityString(),
                         issue.getStatus().getShortName(),
-                        raisedBy.toString(), assignedTo.toString(),
+                        raisedBy.toString(), raisedBy.getUid(),
+                        assignedTo.toString(),
                         issue.getLastUpdate().getTime(), dc,
                         p.getProcedureKey(), p.getName(),
                         q.getParameterKey(), q.getName());
@@ -309,6 +317,7 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
                 }
             }
         }
+        p = cb.and(p, cb.equal(i.get("isDeleted"), 0));
         p = cb.and(p, cb.equal(dc, i.get("contextId")));
         p = cb.and(p, cb.equal(dc.get(PID), pq.get("procedureId")));
         p = cb.and(p, cb.equal(dc.get(QID), qq.get("parameterId")));
@@ -422,6 +431,7 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
                 }
             }
         }
+        p = cb.and(p, cb.equal(i.get("isDeleted"), 0));
         p = cb.and(p, cb.equal(dc, i.get("contextId")));
         p = cb.and(p, cb.equal(dc.get(PID), pq.get("procedureId")));
         p = cb.and(p, cb.equal(dc.get(QID), qq.get("parameterId")));

@@ -124,6 +124,7 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
             @QueryParam("sort") String sort,
             @QueryParam("start") Integer start,
             @QueryParam("limit") Integer limit,
+            @QueryParam("q") String specimenQuery,
             @QueryParam("s") String sessionId,
             @QueryParam("u") Integer userId) {
         ProcedureSpecimenPack t = new ProcedureSpecimenPack();
@@ -150,7 +151,7 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
                 } catch (JSONException ex) {
                 }
             }
-                        
+
             // we shall use criteria queries instead of named query because
             // there are several client requested specification that could
             // affect the query.
@@ -175,7 +176,7 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
             // schema does not link the two tables procedure_animal_overview
             // and animal_overview using a foreign key.
             Root<AnimalOverview> ao = cq.from(AnimalOverview.class);
-            
+
             // what is the matching criteria?
             Pipeline pipeline = em.find(Pipeline.class, lid);
             Predicate p = cb.and(cb.equal(pao.get("centreId"), cid),
@@ -183,12 +184,18 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
                     cb.equal(pao.get("genotypeId"), gid),
                     cb.equal(pao.get("strainId"), sid),
                     cb.equal(pao.get("procedureId"), peid));
-            
+
             // next, we should select only the records that are visible
             // in the specified window (which is when paging is used).
             // Note here that since we are not using a join, we have to
             // add an additional criteria to match the two tables.
             p = cb.and(cb.equal(pao.get("animalId"), ao.get("animalId")), p);
+
+            // Search for specimen
+            if (specimenQuery != null) {
+                p = cb.and(cb.like(pao.<String>get("animalName"),
+                        "%" + specimenQuery + "%"), p);
+            }
             cq.where(p);
 
             // first we need the count of the number of records that match
@@ -223,15 +230,15 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
             // require a selection of fields from both tables. Make a selection
             // as required by the procedure-specimen entity. This is the record
             // that will be returned as a JSON response.
-            CompoundSelection<ProcedureSpecimen> ps =
-                    cb.construct(ProcedureSpecimen.class,
-                    ao.get("animalId"), pao.get("procedureOccurrenceId"),
-                    ao.get("animalName"), ao.get("cohortName"), pao.get("sex"),
-                    pao.get("zygosity"), ao.get("dob"), ao.get("litter"),
-                    pao.get("pipeline"), pao.get("experimenter"),
-                    pao.get("startDate"), pao.get("equipmentname"),
-                    pao.get("equipmentmodel"),
-                    pao.get("equipmentmanufacturer"));
+            CompoundSelection<ProcedureSpecimen> ps
+                    = cb.construct(ProcedureSpecimen.class,
+                            ao.get("animalId"), pao.get("procedureOccurrenceId"),
+                            ao.get("animalName"), ao.get("cohortName"), pao.get("sex"),
+                            pao.get("zygosity"), ao.get("dob"), ao.get("litter"),
+                            pao.get("pipeline"), pao.get("experimenter"),
+                            pao.get("startDate"), pao.get("equipmentname"),
+                            pao.get("equipmentmodel"),
+                            pao.get("equipmentmanufacturer"));
 
             cq.select(ps);
             TypedQuery<ProcedureSpecimen> query = em.createQuery(cq);

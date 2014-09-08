@@ -48,10 +48,14 @@ Ext.define('PhenoDCC.model.Issue', {
         name: 'raisedBy'
     },
     {
+        name: 'raisedByUid',
+        type: 'int'
+    },
+    {
         name: 'assignedTo'
     },
     {
-        name: 'lastupdate',
+        name: 'lastUpdate',
         type: 'date',
         dateFormat: 'time'
     }],

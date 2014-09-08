@@ -23,37 +23,39 @@ Ext.define('PhenoDCC.view.ProceduresPanel', {
     alias: 'widget.procedurespanel',
     title: "Procedures",
     border: 0,
-    requires: [ 'PhenoDCC.store.Procedures' ],
+    requires: ['PhenoDCC.store.Procedures'],
     store: 'Procedures',
     viewConfig: {
         enableTextSelection: true
     },
     initComponent: function() {
         this.columns = [{
-            text: "IMPReSS Id",
-            dataIndex: 'e',
-            width: 106,
-            sortable: true
-        },
-        {
-            text: "&#9881;",
-            dataIndex: 's',
-            width: 32,
-            sortable: true,
-            renderer: dcc.getStateIcon
-        },
-        {
-            text: "Name",
-            dataIndex: 'n',
-            flex: 1,
-            sortable: true
-        },
-        {
-            text: "&#9888;",
-            dataIndex: 'ur',
-            width: 32,
-            sortable: true
-        }];
+                text: "IMPReSS Id",
+                dataIndex: 'e',
+                width: 106,
+                sortable: true
+            },
+            {
+                text: "Status",
+                dataIndex: 's',
+                width: 50,
+                sortable: true,
+                renderer: function(stateId, metaData, record) {
+                    return dcc.getStateIcon(stateId, metaData, record, false);
+                }
+            },
+            {
+                text: "Name",
+                dataIndex: 'n',
+                flex: 1,
+                sortable: true
+            },
+            {
+                text: "&#9888;",
+                dataIndex: 'ur',
+                width: 32,
+                sortable: true
+            }];
         this.callParent();
     }
 });

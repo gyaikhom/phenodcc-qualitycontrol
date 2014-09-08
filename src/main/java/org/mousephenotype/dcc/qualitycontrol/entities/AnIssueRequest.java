@@ -39,9 +39,10 @@ public class AnIssueRequest implements Serializable {
     private Short priority;
     private Integer status;
     private Long contextId;
-    private Integer raisedBy;
+    private String raisedBy;
+    private Integer raisedByUid;
     private Integer assignedTo;
-    private Long lastupdate;
+    private Long lastUpdate;
     private String title;
     private String description;
     private Integer[] datapoints;
@@ -50,22 +51,6 @@ public class AnIssueRequest implements Serializable {
     private static final Integer RAISE_ISSUE = 0;
 
     public AnIssueRequest() {
-    }
-
-    public AnIssueRequest(Long id, String title, String description,
-            Short priority, Integer status, Long contextId,
-            Integer[] datapoints, Integer raisedBy, Integer assignedTo,
-            Long lastUpdate) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.contextId = contextId;
-        this.datapoints = datapoints;
-        this.priority = priority;
-        this.status = status;
-        this.raisedBy = raisedBy;
-        this.assignedTo = assignedTo;
-        this.lastupdate = lastUpdate;
     }
 
     private IssueStatus getIssueStatus(EntityManager em, Integer status) {
@@ -81,8 +66,9 @@ public class AnIssueRequest implements Serializable {
         issue.setTitle(title);
         issue.setPriority(priority);
         issue.setStatus(getIssueStatus(em, status));
-        issue.setRaisedBy(raisedBy);
+        issue.setRaisedBy(raisedByUid);
         issue.setAssignedTo(assignedTo);
+        issue.setIsDeleted(0);
         return issue;
     }
 
@@ -98,7 +84,7 @@ public class AnIssueRequest implements Serializable {
         AnAction action = new AnAction();
         action.setDescription(description);
         action.setActionType(getActionType(em, RAISE_ISSUE));
-        action.setActionedBy(raisedBy);
+        action.setActionedBy(raisedByUid);
         return action;
     }
 
@@ -158,12 +144,20 @@ public class AnIssueRequest implements Serializable {
         this.datapoints = datapoints;
     }
 
-    public Integer getRaisedBy() {
+    public String getRaisedBy() {
         return raisedBy;
     }
 
-    public void setRaisedBy(Integer raisedBy) {
+    public void setRaisedBy(String raisedBy) {
         this.raisedBy = raisedBy;
+    }
+
+    public Integer getRaisedByUid() {
+        return raisedByUid;
+    }
+
+    public void setRaisedByUid(Integer raisedByUid) {
+        this.raisedByUid = raisedByUid;
     }
 
     public Integer getAssignedTo() {
@@ -174,11 +168,11 @@ public class AnIssueRequest implements Serializable {
         this.assignedTo = assignedTo;
     }
 
-    public Long getLastupdate() {
-        return lastupdate;
+    public Long getLastUpdate() {
+        return lastUpdate;
     }
 
-    public void setLastupdate(Long lastupdate) {
-        this.lastupdate = lastupdate;
+    public void setLastUpdate(Long lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

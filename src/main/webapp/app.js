@@ -19,8 +19,23 @@
  * @author Gagarine Yaikhom <g.yaikhom@har.mrc.ac.uk>
  */
 
+/* The following enables asynchronous download of the ExtJS components. This
+ * means faster application loading on the client browser.
+ */
+//Ext.Loader.setConfig({
+//    enabled: true
+//});
+
+/* Here, we define a new Javascript namespace named 'PhenoDCC', and all of its
+ * components (views, model, stores, and controllers) are stored under the
+ * ExJS web application directory 'app'. The Ext.Loader above now knows what to
+ * load, and where to load (using the specified namespace to avoid conclict).
+ */
+//Ext.Loader.setPath('PhenoDCC', 'app');
+
 /* Everything is ready! So, let us build the web application by selecting and
- * joining the components together. */
+ * joining the components together.
+ */
 Ext.application({
     name: 'PhenoDCC', /* name of the application (same as namespace) */
     appFolder: 'app',
@@ -57,7 +72,8 @@ Ext.application({
      * 3. these 'root' property names are in fact the URI path component for
      *    accessing the corresponding REST web services.
      *
-     * See individual model and store for further detail. */
+     * See individual model and store for further detail.
+     */
     stores: [
     'Actions',
     'ActionTypes',
@@ -78,6 +94,7 @@ Ext.application({
     ],
 
     /* The following are controllers that encapsulate the logic and event
-     * management system for all of the views defined in the viewport. */
+     * management system for all of the views defined in the viewport.
+     */
     controllers: ['QualityControl']
 });

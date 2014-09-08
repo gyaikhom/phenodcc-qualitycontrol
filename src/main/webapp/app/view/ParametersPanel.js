@@ -23,56 +23,58 @@ Ext.define('PhenoDCC.view.ParametersPanel', {
     alias: 'widget.parameterspanel',
     title: "Parameters",
     border: 0,
-    requires: [ 'PhenoDCC.store.Parameters' ],
+    requires: ['PhenoDCC.store.Parameters'],
     store: 'Parameters',
     viewConfig: {
         enableTextSelection: true
     },
     initComponent: function() {
         this.columns = [{
-            text: "IMPReSS Id",
-            dataIndex: 'e',
-            width: 140,
-            sortable: true,
-            renderer: function(stateId, metaData, record) {
-                var key = record.get('e');
-                return record.get("r") ? '<span class="required">'
-                    + key + '</span>' : key;
-            }
-        },
-        {
-            text: "&#9881;",
-            dataIndex: 'q',
-            width: 32,
-            sortable: true,
-            renderer: dcc.getStateIcon
-        },
-        {
-            text: "Name",
-            dataIndex: 'n',
-            flex: 1,
-            sortable: true
-        },
-        {
-            text: "&#9888;",
-            dataIndex: 'ur',
-            width: 32,
-            sortable: true
-        },
-        {
-            text: "QC Max",
-            dataIndex: 'qM',
-            width: 80,
-            sortable: true,
-            hidden: true
-        },
-        {
-            text: "QC Min",
-            dataIndex: 'qm',
-            width: 80,
-            sortable: true,
-            hidden: true
-        }];
+                text: "IMPReSS Id",
+                dataIndex: 'e',
+                width: 140,
+                sortable: true,
+                renderer: function(stateId, metaData, record) {
+                    var key = record.get('e');
+                    return record.get("r") ? '<span class="required">'
+                        + key + '</span>' : key;
+                }
+            },
+            {
+                text: "Status",
+                dataIndex: 'q',
+                width: 50,
+                sortable: true,
+                renderer: function(stateId, metaData, record) {
+                    return dcc.getStateIcon(stateId, metaData, record, true);
+                }
+            },
+            {
+                text: "Name",
+                dataIndex: 'n',
+                flex: 1,
+                sortable: true
+            },
+            {
+                text: "&#9888;",
+                dataIndex: 'ur',
+                width: 32,
+                sortable: true
+            },
+            {
+                text: "QC Max",
+                dataIndex: 'qM',
+                width: 80,
+                sortable: true,
+                hidden: true
+            },
+            {
+                text: "QC Min",
+                dataIndex: 'qm',
+                width: 80,
+                sortable: true,
+                hidden: true
+            }];
         this.callParent();
     }
 });

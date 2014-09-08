@@ -22,62 +22,88 @@ Ext.define('PhenoDCC.view.DataVisualisation', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.datavisualisation',
     requires: [
-    'PhenoDCC.view.ProcedureSpecimens',
-    'PhenoDCC.view.QcIssues'
+        'PhenoDCC.view.ProcedureSpecimens',
+        'PhenoDCC.view.QcIssues'
     ],
     layout: 'fit',
     border: 0,
     initComponent: function() {
         this.items =
-        {
-            xtype: 'container',
-            id: 'data-view-specimen-centric-tab',
-            layout: 'border',
-            items: [
             {
                 xtype: 'container',
-                region: 'center',
+                id: 'data-view-specimen-centric-tab',
                 layout: 'border',
-                items:
-                {
-                    xtype: 'container',
-                    id: 'specimen-centric-visualisation-container',
-                    region: 'center',
-                    style: 'background: #fff',
-                    html: '<div id="specimen-centric-visualisation" style="height: 100%;"></div>',
-                    disabled: true
-                }
-            },
-            {
-                xtype: 'tabpanel',
-                title: 'Specimens and Quality Control Issues',
-                id: 'data-view-specimens-qc-panel',
-                region: 'south',
-                height: '40%',
-                split: true,
-                collapsible: true,
-                animCollapse: false,
-                tabPosition: 'top',
-                border: 0,
-                plain: true,
-                bodyStyle: 'border:0px;',
                 items: [
-                {
-                    xtype: 'qcissues',
-                    id: 'data-view-qc-issues'
-                },
-                {
-                    xtype: 'procedurespecimens',
-                    id: 'data-view-procedure-specimens-panel'
-                },
-                {
-                    xtype: 'container',
-                    title: 'History',
-                    id: 'data-view-history-panel'
-                }]
-            }
-            ]
-        };
+                    {
+                        xtype: 'container',
+                        region: 'center',
+                        layout: 'border',
+                        items:
+                            {
+                                xtype: 'container',
+                                id: 'specimen-centric-visualisation-container',
+                                region: 'center',
+                                style: 'background: #fff',
+                                html: '<div id="specimen-centric-visualisation" style="height: 100%;"></div>',
+                                disabled: true
+                            }
+                    },
+                    {
+                        xtype: 'tabpanel',
+                        title: 'Specimens and Quality Control Issues',
+                        id: 'data-view-specimens-qc-panel',
+                        region: 'south',
+                        height: '40%',
+                        split: true,
+                        collapsible: true,
+                        animCollapse: false,
+                        tabPosition: 'top',
+                        border: 0,
+                        plain: true,
+                        bodyStyle: 'border:0px;',
+                        items: [
+                            {
+                                xtype: 'qcissues',
+                                id: 'data-view-qc-issues'
+                            },
+                            {
+                                xtype: 'panel',
+                                title: "Specimen and experiment details",
+                                layout: 'border',
+                                border: 0,
+                                items: [
+                                    {
+                                        xtype: 'form',
+                                        region: 'north',
+                                        height: 40,
+                                        style: 'padding-top: 10px;',
+                                        items: {
+                                            xtype: 'textfield',
+                                            fieldLabel: 'Search specimen',
+                                            width: 500,
+                                            listeners: {
+                                                change: function(field, newValue, oldValue, eOpts) {
+                                                    dcc.specimenSearchQuery = newValue;
+                                                    dcc.throttle(dcc.extjs.controller.searchForSpecimen, 500, dcc.extjs.controller);
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        xtype: 'procedurespecimens',
+                                        id: 'data-view-procedure-specimens-panel',
+                                        region: 'center'
+                                    }
+                                ]
+                            },
+                            {
+                                xtype: 'container',
+                                title: 'History',
+                                id: 'data-view-history-panel'
+                            }]
+                    }
+                ]
+            };
         this.callParent();
     }
 });

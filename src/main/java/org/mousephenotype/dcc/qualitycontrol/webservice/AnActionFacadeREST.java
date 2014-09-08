@@ -30,6 +30,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import org.eclipse.persistence.exceptions.DatabaseException;
 import org.mousephenotype.dcc.qualitycontrol.entities.AnActionRequest;
 import org.mousephenotype.dcc.qualitycontrol.entities.AnActionResponse;
 import org.mousephenotype.dcc.entities.qc.AUser;
@@ -51,6 +52,8 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
     /* the following must match cid in phenodcc_qc.action_type */
     private static final Integer ACCEPT_ISSUE = 2;
     private static final Integer RESOLVE_ISSUE = 4;
+    private static final Integer DELETE_ISSUE = 11;
+
     /* the following must match cid in phenodcc_qc.issue_status */
     private static final Integer ISSUE_ACCEPTED = 1;
     private static final Integer ISSUE_RESOLVED = 4;
@@ -59,18 +62,10 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
         super(AnAction.class);
     }
 
-    @POST
-    @Path("extjs")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public AnAction createAction(AnActionRequest entity,
-            @QueryParam("s") String sessionId,
-            @QueryParam("u") Integer userId) {
-        AnAction action;
-        if (isValidSession(sessionId, userId)) {
-            EntityManager em = getEntityManager();
-            action = entity.getAction(em);
-
+    private AnAction doAction(Integer userId,
+            AnActionRequest request, EntityManager em) {
+        AnAction action = request.getAction(em);
+        try {
             em.getTransaction().begin();
             em.persist(action);
             em.flush();
@@ -80,7 +75,7 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
             em.persist(new History(context, userId, action.getActionType(),
                     context.getStateId(), action, action.getIssueId()));
 
-            Integer actionType = entity.getActionType();
+            Integer actionType = request.getActionType();
             Integer issueStatus = -1;
 
             if (actionType == ACCEPT_ISSUE) {
@@ -90,9 +85,9 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
             }
 
             if (issueStatus != -1) {
-                TypedQuery<IssueStatus> query =
-                        em.createNamedQuery("IssueStatus.findByCid",
-                        IssueStatus.class);
+                TypedQuery<IssueStatus> query
+                        = em.createNamedQuery("IssueStatus.findByCid",
+                                IssueStatus.class);
                 query.setParameter("cid", issueStatus);
                 query.setMaxResults(1);
                 IssueStatus status = query.getSingleResult();
@@ -108,9 +103,81 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
             }
             em.getTransaction().commit();
             em.refresh(action);
-            em.close();
-        } else {
+        } catch (DatabaseException e) {
             action = null;
+        }
+        return action;
+    }
+
+    private AnAction markIssueAsDeleted(Integer userId,
+            AnActionRequest request, EntityManager em) {
+        AnAction action = request.getAction(em);
+        AnIssue issue = action.getIssueId();
+
+        /* issues can only be deleted by the user who raised it */
+        if (issue.getRaisedBy().compareTo(userId) != 0) {
+            return action;
+        }
+
+        try {
+            TypedQuery<History> historyQuery
+                    = em.createNamedQuery("History.findByIssueId",
+                            History.class);
+            historyQuery.setParameter("issueId", issue);
+            List<History> historyEntries = historyQuery.getResultList();
+            DataContext context = action.getIssueId().getContextId();
+
+            em.getTransaction().begin();
+            if (context.getNumIssues() > 0) {
+                /* we are deleting an issue */
+                context.setNumIssues(context.getNumIssues() - 1);
+                
+                /* if deleted issue was initially marked as resolved, then also
+                decrement the number of resolved issues. */
+                if (issue.getStatus().getCid().intValue() == ISSUE_RESOLVED
+                        && context.getNumResolved() > 0) {
+                    context.setNumResolved(context.getNumResolved() - 1);
+                }
+            } else {
+                /* fix the number of issues and number of resolved issues */
+                context.setNumIssues(0);
+                context.setNumResolved(0);
+            }
+            em.flush();
+            em.refresh(context);
+            issue.setIsDeleted(1);
+            em.flush();
+            em.refresh(issue);
+
+            Iterator<History> entries = historyEntries.iterator();
+            while (entries.hasNext()) {
+                History history = entries.next();
+                history.setIsDeleted(1);
+                em.flush();
+            }
+            em.getTransaction().commit();
+        } catch (DatabaseException e) {
+            action = null;
+        }
+        return action;
+    }
+
+    @POST
+    @Path("extjs")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public AnAction createAction(AnActionRequest request,
+            @QueryParam("s") String sessionId,
+            @QueryParam("u") Integer userId) {
+        AnAction action = null;
+        if (isValidSession(sessionId, userId)) {
+            EntityManager em = getEntityManager();
+            if (request.getActionType() == DELETE_ISSUE) {
+                action = markIssueAsDeleted(userId, request, em);
+            } else {
+                action = doAction(userId, request, em);
+            }
+            em.close();
         }
         return action;
     }
@@ -158,8 +225,8 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
             if (action == null) {
                 p.setDataSet(null, 0L);
             } else {
-                ArrayList<AnActionResponse> t =
-                        new ArrayList<>();
+                ArrayList<AnActionResponse> t
+                        = new ArrayList<>();
                 t.add(prepareActionResponse(action));
                 p.setDataSet(t);
             }
@@ -181,8 +248,8 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
             if (actions.isEmpty()) {
                 p.setDataSet(null, 0L);
             } else {
-                ArrayList<AnActionResponse> t =
-                        new ArrayList<>();
+                ArrayList<AnActionResponse> t
+                        = new ArrayList<>();
                 Iterator<AnAction> i = actions.iterator();
                 while (i.hasNext()) {
                     t.add(prepareActionResponse(i.next()));
@@ -209,15 +276,15 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
             EntityManager em = getEntityManager();
             AnIssue issue = em.find(AnIssue.class, id);
             if (issue != null) {
-                TypedQuery<AnAction> actionQuery =
-                        em.createNamedQuery("AnAction.findByIssueId",
-                        AnAction.class);
+                TypedQuery<AnAction> actionQuery
+                        = em.createNamedQuery("AnAction.findByIssueId",
+                                AnAction.class);
                 actionQuery.setParameter("issueId", issue);
                 try {
                     List<AnAction> actions = actionQuery.getResultList();
                     if (!actions.isEmpty()) {
-                        ArrayList<AnActionResponse> t =
-                                new ArrayList<>();
+                        ArrayList<AnActionResponse> t
+                                = new ArrayList<>();
                         Iterator<AnAction> i = actions.iterator();
                         while (i.hasNext()) {
                             t.add(prepareActionResponse(i.next()));
