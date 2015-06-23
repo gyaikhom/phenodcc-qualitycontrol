@@ -9,7 +9,7 @@ data is archived at the central data archive hosted at
 [EMBL-EBI](http://www.ebi.ac.uk/services/teams/impc).
 
 
-![Screenshot of PhenoDCC QC Tool](qctool.jpg)
+![Screenshot of PhenoDCC QC Tool](qctool.png)
 
 
 ## Salient features
