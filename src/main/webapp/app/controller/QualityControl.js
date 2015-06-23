@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* global d3, dcc, Ext */
+
 /**
  *
  * @author Gagarine Yaikhom <g.yaikhom@har.mrc.ac.uk>
@@ -121,7 +123,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     /**
      * Function init() sets the handlers for events fired by the views.
      */
-    init: function() {
+    init: function () {
         this.control(
             {
                 '#data-view-centre-dropdown': {
@@ -153,7 +155,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                     activate: this.onOverallTabActivate
                 },
                 '#all-issues-tab': {
-                    activate: function() {
+                    activate: function () {
                         if (!dcc.allIssuesAlreadyLoaded)
                             this.loadAllIssues();
                     }
@@ -200,7 +202,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         );
     },
     ptype: {},
-    setExtraParams: function(proxy) {
+    setExtraParams: function (proxy) {
         if (proxy !== null) {
             proxy.extraParams.cid = dcc.dataContext.cid; /* centre */
             proxy.extraParams.lid = dcc.dataContext.lid; /* pipeline */
@@ -213,14 +215,14 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         }
         return proxy;
     },
-    updateProcedureSpecimensProxy: function() {
+    updateProcedureSpecimensProxy: function () {
         var me = this, store = me.getProcedureSpecimensStore();
         if (store !== null) {
             Ext.getCmp('procedure-specimens-pager').moveFirst();
             me.setExtraParams(store.getProxy());
         }
     },
-    updateMeasurementsProxy: function() {
+    updateMeasurementsProxy: function () {
         var me = this, store = me.getMeasurementsStore(), proxy;
         if (store !== null) {
             proxy = me.setExtraParams(store.getProxy());
@@ -229,7 +231,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             }
         }
     },
-    updateIssuesProxy: function() {
+    updateIssuesProxy: function () {
         var me = this, store = me.getIssuesStore(), proxy;
         if (store !== null) {
             proxy = store.getProxy();
@@ -237,7 +239,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                 proxy.url = 'rest/issues/' + dcc.dataContext.id;
         }
     },
-    updatePipelinesProxy: function() {
+    updatePipelinesProxy: function () {
         var me = this, store = me.getPipelinesStore(), proxy;
         if (store) {
             proxy = store.getProxy();
@@ -245,36 +247,36 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                 proxy.extraParams.cid = dcc.dataContext.cid;
         }
     },
-    setCentre: function(cid) {
+    setCentre: function (cid) {
         dcc.dataContext.cid = cid;
         dcc.allIssuesAlreadyLoaded = null;
         this.application.fireEvent("centrechange");
     },
-    setPipeline: function(lid) {
+    setPipeline: function (lid) {
         dcc.dataContext.lid = lid;
         this.application.fireEvent("pipelinechange");
     },
-    setGenotype: function(gid) {
+    setGenotype: function (gid) {
         dcc.dataContext.gid = gid;
         this.application.fireEvent("genotypechange");
     },
-    setStrain: function(sid) {
+    setStrain: function (sid) {
         dcc.dataContext.sid = sid;
         this.application.fireEvent("strainchange");
     },
-    setProcedure: function(pid, peid) {
+    setProcedure: function (pid, peid) {
         dcc.dataContext.pid = pid;
         dcc.dataContext.peid = peid;
         this.application.fireEvent("procedurechange");
     },
-    setContextId: function() {
+    setContextId: function () {
         dcc.imageViewer = null;
         var me = this, store = me.getDataContextsStore();
         if (store !== null) {
             me.setExtraParams(store.getProxy());
             store.removeAll();
             store.load({
-                callback: function() {
+                callback: function () {
                     if (store.getCount() > 0) {
                         dcc.contextState = store.getAt(0);
                         dcc.dataContext.id = dcc.contextState.get('id');
@@ -287,7 +289,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             });
         }
     },
-    disableDependentPanels: function() {
+    disableDependentPanels: function () {
         var me = this, actionsPanel = me.getActionsPanel(),
             vizContainer = d3.select("#specimen-centric-visualisation");
         me.clearPanel(me.getIssuesPanel());
@@ -300,30 +302,30 @@ Ext.define('PhenoDCC.controller.QualityControl', {
 
         vizContainer.selectAll('div').remove();
     },
-    onCentreChange: function() {
+    onCentreChange: function () {
         var me = this;
         me.updatePipelinesProxy();
         me.loadPipelines();
     },
-    onPipelineChange: function() {
+    onPipelineChange: function () {
         var me = this;
         me.disableDependentPanels();
         me.setContextId();
         me.loadGeneStrains();
     },
-    onGenotypeChange: function() {
+    onGenotypeChange: function () {
     },
-    onStrainChange: function() {
+    onStrainChange: function () {
         this.loadProcedures();
     },
-    onProcedureChange: function() {
+    onProcedureChange: function () {
         var me = this;
         me.loadParameters();
         me.setContextId();
         me.reloadProcedureSpecimens();
         me.reloadIssues();
     },
-    reloadProcedureSpecimens: function(tab) {
+    reloadProcedureSpecimens: function (tab) {
         if (tab === undefined) {
             tab = this.getSpecimenCentricTab();
         }
@@ -332,7 +334,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             this.loadProcedureSpecimens();
         }
     },
-    setContextAndShowIssue: function(selModel, selection) {
+    setContextAndShowIssue: function (selModel, selection) {
         if (selection !== null && selection.length > 0) {
             var me = this, tab, s = selection[0], context = s.get('context');
             tab = me.getQcSummaryIssuesTabpanel();
@@ -350,7 +352,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             me.loadPipelines();
         }
     },
-    reloadIssues: function(tab) {
+    reloadIssues: function (tab) {
         var me = this;
         if (tab === undefined) {
             tab = me.getIssuesTabpanel();
@@ -395,7 +397,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             me.loadIssues();
         }
     },
-    loadAllIssues: function() {
+    loadAllIssues: function () {
         var me = this, store = me.getAllIssuesStore(), proxy;
         if (store !== null) {
             proxy = store.getProxy();
@@ -404,7 +406,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                 proxy.extraParams.filter = dcc.allissuesFilter;
                 me.abortPending(store);
                 store.load({
-                    callback: function() {
+                    callback: function () {
                         dcc.allIssuesAlreadyLoaded = true;
                     },
                     scope: this
@@ -412,11 +414,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             }
         }
     },
-    setSpecimen: function(aid) {
+    setSpecimen: function (aid) {
         dcc.dataContext.aid = aid;
         this.application.fireEvent("specimenchange");
     },
-    setParameter: function(qid, qeid) {
+    setParameter: function (qid, qeid) {
         dcc.dataContext.qid = qid;
         dcc.dataContext.qeid = qeid;
         this.application.fireEvent("parameterchange");
@@ -424,9 +426,9 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     /**
      * The following functions are handlers for data context change events.
      */
-    onSpecimenChange: function() {
+    onSpecimenChange: function () {
     },
-    onParameterChange: function() {
+    onParameterChange: function () {
         var me = this, temp;
         me.setContextId();
         temp = me.getIssueMessagesPanel();
@@ -434,7 +436,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         me.reloadMeasurements();
         me.reloadIssues();
     },
-    reloadMeasurements: function() {
+    reloadMeasurements: function () {
         this.updateMeasurementsProxy();
         this.loadMeasurements();
     },
@@ -443,7 +445,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * parameter identifiers (both internal database and EMPReSS Ids) in the
      * measurements context.
      */
-    resetMeasurementsContext: function() {
+    resetMeasurementsContext: function () {
         this.setParameter(-1, null);
         this.setSpecimen(-1);
     },
@@ -451,7 +453,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function isValidDataContext() checks if the centre, genotype,
      * background strain and procedure Ids are valid.
      */
-    isValidDataContext: function() {
+    isValidDataContext: function () {
         if (dcc.dataContext.cid < 0
             || dcc.dataContext.lid < 0
             || dcc.dataContext.gid < 0
@@ -466,7 +468,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function isValidMeasurementsContext() checks if the procedure
      * occurrence and EMPReSS parameter Ids are valid.
      */
-    isValidMeasurementsContext: function() {
+    isValidMeasurementsContext: function () {
         if (dcc.dataContext.poid < 0
             || dcc.dataContext.qeid === null
             || dcc.dataContext.qeid.length === 0) {
@@ -479,7 +481,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function getFormattedDataContext() returns a formatted string that
      * can be used to display the data context.
      */
-    getFormattedDataContext: function() {
+    getFormattedDataContext: function () {
         var s = 'cid: ' + dcc.dataContext.cid + ', ';
         s += 'lid: ' + dcc.dataContext.lid + ', ';
         s += 'gid: ' + dcc.dataContext.gid + ', ';
@@ -494,7 +496,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * actual data store (see function selectStrain()) and the formatting
      * specification.
      */
-    formatGeneDetail: function(data, props) {
+    formatGeneDetail: function (data, props) {
         var detail =
             '<div id="phenodcc-gene-details-header">Gene details</div><br/>'
             + '<table id="phenodcc-gene-detail">';
@@ -508,7 +510,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         }
         return detail + "</table>";
     },
-    formatGeneDetailsForPopup: function(data) {
+    formatGeneDetailsForPopup: function (data) {
         var props = [
             {
                 label: 'MGI Id',
@@ -541,7 +543,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * generate a minimal tree store just for displaying the tree panel, and
      * use an index in the actual genestrains data store to dereference values.
      */
-    selectStrain: function(ridx) {
+    selectStrain: function (ridx) {
         /* formatting specification to use in function formatGeneDetail() */
         var props = [
             {
@@ -597,7 +599,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function onGeneAlleleStrainSelect() is an event handler which is
      * invoked when a background strain is selected from the gene/strain tree,
      */
-    onGeneAlleleStrainSelect: function(view, node) {
+    onGeneAlleleStrainSelect: function (view, node) {
         if (!node.isLeaf()) {
             this.setDefaultDetail();
             if (node.isExpandable()) {
@@ -608,7 +610,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     /**
      * Event handler when selection changes on the tree panel.
      */
-    onGeneAlleleSelectionChange: function(view, selection) {
+    onGeneAlleleSelectionChange: function (view, selection) {
         if (selection !== null && selection.length) {
             var ridx = selection[0].raw.ridx;
             if (ridx !== undefined) {
@@ -620,7 +622,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             }
         }
     },
-    clearGeneContextDetails: function() {
+    clearGeneContextDetails: function () {
         d3.select('#context-details-genesymbol').text('');
         d3.select('#context-details-genotype').text('');
         d3.select('#context-details-allele').html('');
@@ -629,18 +631,18 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     /**
      * Function updateDetail() updates the content of the gene details panel.
      */
-    updateDetails: function(content) {
+    updateDetails: function (content) {
         var d = this.getGeneAlleleStrainDetailsPanel();
         if (!d.detailEl) {
             d.detailEl = d.body.createChild();
         }
         d.detailEl.update("<div class='select-gene-for-details'>" + content + "</div>");
     },
-    setDefaultDetail: function() {
+    setDefaultDetail: function () {
         this.clearGeneContextDetails();
         this.updateDetails("Select a background strain to get additional details.");
     },
-    setEmptyTree: function() {
+    setEmptyTree: function () {
         this.clearGeneContextDetails();
         this.updateDetails("Did not find genotype/background strain with data for the selected centre and pipeline.");
     },
@@ -649,7 +651,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * allele identifier to a formatted string that will be used in the genes
      * and strains tree panel as node labels.
      */
-    combineGeneSymbolAndAllele: function(item) {
+    combineGeneSymbolAndAllele: function (item) {
         var allele = item.data.alleleName;
         if (allele && allele.length > 0)
             return allele.replace('<sup>', ' : <span class="allele-name">')
@@ -657,7 +659,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         else
             return item.data.geneSymbol;
     },
-    regexEscape: function(str) {
+    regexEscape: function (str) {
         var specials = new RegExp("[.*+?|()\\[\\]{}\\\\]", "g");
         return str.replace(specials, "\\$&");
     },
@@ -671,7 +673,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * The plan is to peiodically update this store in the background, or to
      * load the data when requested explicitly by the user.
      */
-    onGeneAlleleStrainSearch: function(t, newValue, oldValue, eOpts) {
+    onGeneAlleleStrainSearch: function (t, newValue, oldValue, eOpts) {
         var me = this, expand = false, /* should we expand the tree hierarchy? */
             s = me.getGeneStrainsStore(); /* store to filter */
         me.setDefaultDetail(); /* no item selected, remove existing detail */
@@ -683,7 +685,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
              * or the name of the background strain.
              */
             var pattern = new RegExp(me.regexEscape(newValue), 'i');
-            s.filterBy(function(item) {
+            s.filterBy(function (item) {
                 return pattern.test(item.data.geneSymbol)
                     || pattern.test(item.data.strain);
             });
@@ -724,31 +726,33 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * the data are required to generate the records as required. If the data
      * is not already grouped, use HashMap instead of Arrays.
      */
-    createTree: function(records) {
+    createTree: function (records) {
         if (records === null) {
             return null;
         }
         var c = records.length, tree = {
             'text': 'Genes and strains',
             'children': []
-        }, currentStrain = null, i = 0, aidx = -1, iconCls;
+        }, currentStrain = null, i = 0, aidx = -1;
         while (i < c) {
-            var record = records[i], thisStrain = record.data.strain;
-            if (currentStrain !== thisStrain) {
-                tree.children.push({
-                    'text': thisStrain,
-                    'iconCls': 'strain',
-                    'children': []
+            var record = records[i], thisStrain = record.get('strain');
+            if (!(dcc.hideQcTicked && record.get('stateId') === 1)) {
+                if (currentStrain !== thisStrain) {
+                    tree.children.push({
+                        'text': thisStrain,
+                        'iconCls': 'strain',
+                        'children': []
+                    });
+                    currentStrain = thisStrain;
+                    ++aidx;
+                }
+                tree.children[aidx].children.push({
+                    'text': this.combineGeneSymbolAndAllele(record),
+                    'leaf': true,
+                    'iconCls': dcc.getStateIconName(record),
+                    'ridx': i /* index to record in store */
                 });
-                currentStrain = thisStrain;
-                ++aidx;
             }
-            tree.children[aidx].children.push({
-                'text': this.combineGeneSymbolAndAllele(record),
-                'leaf': true,
-                'iconCls': dcc.getStateIconName(record),
-                'ridx': i /* index to record in store */
-            });
             ++i; /* move to next record */
         }
         return tree;
@@ -758,25 +762,36 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * under the same strain. To find the index in the tree panel, we have to
      * count all of the strains until we find the correct record.
      */
-    getGeneStrainTreeIndex: function(store) {
-        var i, c, index = 0, sid = -1, record, found = false;
+    getGeneStrainTreeIndex: function (store) {
+        var i, c, index = 0, sid = -1, record, found = false, firstUsable = -1,
+            numLinesFoundForStrain = 0;
         for (i = 0, c = store.getCount(); i < c; ++i) {
             record = store.getAt(i);
             /* does this record correspond to the
              * beginning of a strain expander? */
             if (sid !== record.get('sid')) {
+                if (sid === -1 || numLinesFoundForStrain > 0)
+                    ++index; /* one tree expander found */
                 sid = record.get('sid');
-                ++index; /* one tree expander found */
             }
-            /* have we found the right genotype and strain? */
-            if (sid === dcc.dataContext.sid
-                && record.get('gid') === dcc.dataContext.gid) {
-                found = true;
-                break;
+            if (!(dcc.hideQcTicked && record.get('stateId') === 1)) {
+                ++numLinesFoundForStrain;
+                if (firstUsable === -1) {
+                    firstUsable = index;    
+                }
+
+                /* have we found the right genotype and strain? */
+                if ((sid === dcc.dataContext.sid
+                    && record.get('gid') === dcc.dataContext.gid)) {
+                    found = true;
+                    break;
+                }
+                ++index;
             }
-            ++index;
         }
-        return found ? index : -1;
+        if (!found)
+            index = firstUsable;
+        return index;
     },
     /**
      * Function showTree() first generates a hierarchical tree data structure
@@ -786,7 +801,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * data store was loaded using loadGeneStrains(), is disabled to mark that
      * the tree panel is ready for interaction.
      */
-    showTree: function(records) {
+    showTree: function (records) {
         this.getGeneStrainProcedureParameterTabpanel().setActiveTab(0);
 
         var tree = this.createTree(records),
@@ -802,15 +817,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             store.removeAll(true);
         } else {
             searchBox.enable(true);
-            var geneStrainRecordIndex = store.findBy(function(record) {
-                return record.get('gid') === dcc.dataContext.gid
-                    && record.get('sid') === dcc.dataContext.sid;
-            });
-            if (geneStrainRecordIndex === -1) {
+            treePanel.expandAll();
+            var geneIndex = this.getGeneStrainTreeIndex(store);
+            if (geneIndex === -1) {
                 this.setDefaultDetail();
             } else {
-                treePanel.expandAll();
-                var geneIndex = this.getGeneStrainTreeIndex(store);
                 var selModel = treePanel.getSelectionModel();
                 selModel.select(geneIndex);
             }
@@ -821,12 +832,12 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function loadCentres() loads all of the active centres (or institutes)
      * that are providing phenotype data.
      */
-    loadCentres: function() {
+    loadCentres: function () {
         var me = this;
         var store = me.getCentresStore();
         store.removeAll();
         store.load({
-            callback: function() {
+            callback: function () {
                 var cdd = me.getCentresDropdown();
                 if (store.getCount() > 0) {
                     var centreIndex = store.find('i', dcc.dataContext.cid);
@@ -842,12 +853,12 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             scope: this
         });
     },
-    loadPipelines: function() {
+    loadPipelines: function () {
         var me = this;
         var store = me.getPipelinesStore();
         store.removeAll();
         store.load({
-            callback: function() {
+            callback: function () {
                 var pdd = me.getPipelinesDropdown();
                 if (store.getCount() > 0) {
                     var pipeline = store.find('i', dcc.dataContext.lid);
@@ -872,7 +883,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * identifier. This function should, therefore, be invoked everytime the
      * centre selection changs in the centre drop-down menu.
      */
-    loadGeneStrains: function() {
+    loadGeneStrains: function () {
         var me = this;
         if (dcc.dataContext.cid < 0) {
             return;
@@ -897,13 +908,13 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             });
         }
     },
-    clearPanel: function(panel) {
+    clearPanel: function (panel) {
         var store = panel.getStore();
         store.removeAll();
         return store;
     },
-    findNextProcedure: function(store) {
-        var next = store.findBy(function(record, id) {
+    findNextProcedure: function (store) {
+        var next = store.findBy(function (record, id) {
             var stateId = record.get('s');
             /* exclude no data and qc done procedures */
             return stateId !== 0 && stateId !== 1;
@@ -911,7 +922,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
 
         /* if all procedures are QC done, select first with data */
         if (next === -1)
-            next = store.findBy(function(record, id) {
+            next = store.findBy(function (record, id) {
                 var stateId = record.get('s');
                 return stateId !== 0;
             });
@@ -921,8 +932,8 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             next = 0;
         return next;
     },
-    findNextParameter: function(store) {
-        var next = store.findBy(function(record, id) {
+    findNextParameter: function (store) {
+        var next = store.findBy(function (record, id) {
             var stateId = record.get('q');
             /* exclude no data and qc done parameters */
             return stateId !== 0 && stateId !== 1;
@@ -930,7 +941,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
 
         /* if all parameters are QC done, select first with data */
         if (next === -1)
-            next = store.findBy(function(record, id) {
+            next = store.findBy(function (record, id) {
                 var stateId = record.get('q');
                 return stateId !== 0;
             });
@@ -940,7 +951,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             next = 0;
         return next;
     },
-    selectOrDisable: function(panel, contextId) {
+    selectOrDisable: function (panel, contextId) {
         var me = this, returnValue = false;
         panel.setLoading(false);
         var store = panel.getStore();
@@ -978,7 +989,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         }
         return returnValue;
     },
-    loadProcedures: function() {
+    loadProcedures: function () {
         var me = this, p = me.getGeneStrainProcedureParameterTabpanel(),
             panel = me.getProceduresPanel(), store = me.clearPanel(panel);
         p.setActiveTab(1);
@@ -994,7 +1005,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                     gid: dcc.dataContext.gid,
                     sid: dcc.dataContext.sid
                 },
-                callback: function() {
+                callback: function () {
                     /* 3 means update procedure */
                     me.selectOrDisable(panel, 3);
                 },
@@ -1005,7 +1016,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     /**
      * Function abortPending() aborts all pending REST requests.
      */
-    abortPending: function(store) {
+    abortPending: function (store) {
         if (store.isLoading()) {
             Ext.Ajax.abort(store.getProxy().lastRequest);
         }
@@ -1015,7 +1026,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function disablePanel() first hides the load mask (if any) and then
      * disables the panel.
      */
-    disablePanel: function(panel) {
+    disablePanel: function (panel) {
         panel.setLoading(false);
         panel.disable(true);
     },
@@ -1023,7 +1034,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function loadParameters() loads the parameters into the store using
      * the arguments specified by the current data context.
      */
-    loadParameters: function() {
+    loadParameters: function () {
         var me = this;
         var panel = me.getParametersPanel();
         var store = me.clearPanel(panel);
@@ -1040,7 +1051,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                     sid: dcc.dataContext.sid,
                     pid: dcc.dataContext.pid
                 },
-                callback: function() {
+                callback: function () {
                     /* 4 means update parameter */
                     me.selectOrDisable(panel, 4);
                 },
@@ -1052,14 +1063,20 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * type part of the specimen name. This is used to filter out the
      * procedure/specimen list.
      */
-    searchForSpecimen: function() {
+    searchForSpecimen: function (animalId, handler) {
         var me = this, store = me.getProcedureSpecimensStore(), proxy;
         if (store !== null) {
             proxy = store.getProxy();
             if (proxy !== null) {
-                proxy.extraParams.q = dcc.specimenSearchQuery;
+                if (animalId !== undefined) {
+                    proxy.extraParams.n = '';
+                    proxy.extraParams.a = animalId;
+                } else {
+                    proxy.extraParams.n = dcc.specimenNameQuery;
+                    delete proxy.extraParams.a; // clear out animal id search
+                }
                 Ext.getCmp('procedure-specimens-pager').moveFirst();
-                me.loadProcedureSpecimens();
+                me.loadProcedureSpecimens(handler);
             }
         }
     },
@@ -1069,8 +1086,10 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * loaded details are displayed in the procedure-specimen panel which
      * contains specimen details, experiment details, and if any,
      * equipment information.
+     * 
+     * @param {Function} handler Additional handler to run if provided.
      */
-    loadProcedureSpecimens: function() {
+    loadProcedureSpecimens: function (handler) {
         var me = this;
         var panel = me.getProcedureSpecimensPanel();
         var store = me.clearPanel(panel);
@@ -1078,9 +1097,12 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         if (me.isValidDataContext()) {
             panel.setLoading(true, true);
             store.load({
-                callback: function() {
+                callback: function () {
                     /* 5 means update specimen identifier */
                     me.selectOrDisable(panel, 5);
+                    
+                    if (handler !== undefined)
+                        handler();
                 },
                 scope: this
             });
@@ -1091,10 +1113,10 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     /**
      * Function disableChart() cleans the chart and disables it.
      */
-    disableChart: function(chart) {
+    disableChart: function (chart) {
         chart.disable(true);
     },
-    enableChart: function(chart) {
+    enableChart: function (chart) {
         chart.enable(true);
     },
     /**
@@ -1106,7 +1128,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * displayed in the measurements panel which contains incremnt, measured
      * values, and supplimentary data (e.g., mime type and URI if applicable).
      */
-    loadMeasurements: function() {
+    loadMeasurements: function () {
         var me = this, chart = me.getSpecimenCentricVisualisationContainer(),
             node = d3.select('#specimen-centric-visualisation');
         node.selectAll('*').remove();
@@ -1118,10 +1140,10 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         }
     },
     /* Used by visualisation module to get measurements for specific id */
-    getMeasurement: function(measurementId) {
+    getMeasurement: function (measurementId) {
         var me = this, index, store = me.getMeasurementsStore();
         store.clearFilter(true);
-        index = store.findBy(function(record, id) {
+        index = store.findBy(function (record, id) {
             return record.get('m') === measurementId;
         });
         return store.getAt(index);
@@ -1131,14 +1153,14 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * by loading its contents through the web services. Existing selections
      * are discarded, and when loaded, the first item in the list is selected.
      */
-    loadIssues: function() {
+    loadIssues: function () {
         var me = this;
         var panel = me.getIssuesPanel();
         var store = me.clearPanel(panel);
         me.abortPending(store);
         panel.setLoading(true, true);
         store.load({
-            callback: function() {
+            callback: function () {
                 if (store.getCount() > 0) {
                     me.selectOrDisable(panel, 6);
                 } else {
@@ -1149,6 +1171,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                     var actionsPanel = me.getActionsPanel();
                     if (actionsPanel) {
                         actionsPanel.update('<div class="no-issues">Current data context does not have any Quality Control issues</div>');
+                        d3.select('.create-new-action-button').remove();
                         dcc.dataContext.iid = null;
                     }
                 }
@@ -1160,7 +1183,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function onProcedureSelect() is an event handler that is invoked
      * when a procedure is selected in the procedures list panel.
      */
-    onProcedureSelect: function(selModel, selection) {
+    onProcedureSelect: function (selModel, selection) {
         if (selection !== null && selection.length > 0) {
             var s = selection[0];
             this.setProcedure(s.get('i'), s.get('e'));
@@ -1171,7 +1194,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function onParameterSelect() is an event handler that is invoked
      * when a parameter is selected in the parameter list panel.
      */
-    onParameterSelect: function(selModel, selection) {
+    onParameterSelect: function (selModel, selection) {
         var me = this;
         if (selection !== null && selection.length > 0) {
             var s = selection[0], t = me.ptype.l;
@@ -1180,14 +1203,14 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             me.setParameter(s.get('i'), s.get('e'));
         }
     },
-    onSpecimenSelect: function(selModel, selection) {
+    onSpecimenSelect: function (selModel, selection) {
         if (selection !== null && selection.length > 0) {
             var animalId = selection[0].get('ai');
             this.setSpecimen(animalId);
             dcc.selectSpecimen(animalId);
         }
     },
-    onCentreSelect: function(combo, centreId) {
+    onCentreSelect: function (combo, centreId) {
         var node = d3.select('#context-details-centre');
         if (centreId === null)
             node.text('');
@@ -1196,7 +1219,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             this.setCentre(centreId);
         }
     },
-    onPipelineSelect: function(combo, pipelineId) {
+    onPipelineSelect: function (combo, pipelineId) {
         var node = d3.select('#context-details-pipeline');
         if (pipelineId === null)
             node.text('');
@@ -1206,10 +1229,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         }
     },
     /* @TODO Should handle this properly using document fragments. */
-    prepareActions: function(store, status) {
+    prepareActions: function (store, status) {
         var content = "<div id='actions-container'>", count = 0, text,
             markForInvestigation = false;
-        store.each(function(record) {
+
+        store.each(function (record) {
             if (record.get('actionType') === 'accept')
                 markForInvestigation = true;
             text = record.get('description')
@@ -1221,12 +1245,13 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                 .replace(/\n/g, "</p><p>");
             content += "<div class='action-entry-" + (++count % 2 ? "odd" : "even") +
                 "'><div class='action-title'>" +
-                "<span class='actionedon'>" + record.get('lastUpdate') +
-                "</span><span class='actionedby'>" + record.get('actionedBy') +
-                "</span></div><div class='action-description'><p>" +
+                "<span class='actionedby'>" + record.get('actionedBy') + '</span>' +
+                "<span class='actionedon'>" + record.get('lastUpdate') + '</span>' +
+                "</div><div class='action-description'><p>" +
                 text + "</p></div></div>";
         });
 
+        content += '<div class="create-new-action">';
         if (status !== 'resolved') {
             content += '<textarea id="action-detail" class="form-textarea" ' +
                 'rows=10 cols=80 placeholder="Provide details for one of the following actions.">' +
@@ -1241,13 +1266,14 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         if (dcc.roles.uid === dcc.dataContext.raisedByUid) {
             content += '<div id="delete-issue" class="button">Delete issue</div></div><div></div>';
         }
-        return content + "</div>";
+
+        return content + "</div></div>";
     },
-    deleteIssueHandler: function(issueId) {
+    deleteIssueHandler: function (issueId) {
         var me = this;
         d3.select('#delete-issue')
             .attr('title', 'Click here to delete this issue \nand related actions forever')
-            .on('click', function() {
+            .on('click', function () {
                 if (dcc.isQcUser('delete this issue.')) {
                     if (dcc.roles.uid === dcc.dataContext.raisedByUid) {
                         if (window.confirm("Are you sure you wish to delete this issue?")) {
@@ -1259,7 +1285,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                                     "actionType": 11 /* cid for delete action in phenodcc_qc.action_type */
                                 });
                             action.save({
-                                callback: function() {
+                                callback: function () {
                                     me.onPipelineChange();
                                 }
                             });
@@ -1269,11 +1295,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                 }
             });
     },
-    addCommentHandler: function(issueId) {
+    addCommentHandler: function (issueId) {
         var me = this;
         d3.select('#add-comment')
             .attr('title', 'Click here to leave the above text \nas a comment on this issue')
-            .on('click', function() {
+            .on('click', function () {
                 if (dcc.isQcUser('comment on this issue.')) {
                     var d = document.getElementById('action-detail'),
                         action = new Ext.create('PhenoDCC.model.Action', {
@@ -1283,18 +1309,18 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                             "actionType": 1 /* cid for comment in phenodcc_qc.action_type */
                         });
                     action.save({
-                        callback: function() {
+                        callback: function () {
                             me.onPipelineChange();
                         }
                     });
                 }
             });
     },
-    acceptIssueHandler: function(issueId) {
+    acceptIssueHandler: function (issueId) {
         var me = this;
         d3.select('#accept-issue')
             .attr('title', 'Click here to leave the above text as notification \nthat the issue is being looked at')
-            .on('click', function() {
+            .on('click', function () {
                 if (dcc.isQcUser('mark this issue as accepted for investigation.')) {
                     var d = document.getElementById('action-detail').value,
                         action = new Ext.create('PhenoDCC.model.Action', {
@@ -1305,18 +1331,18 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                             "lastUpdate": 0 /* doesn't matter: supplied by server */
                         });
                     action.save({
-                        callback: function() {
+                        callback: function () {
                             me.onPipelineChange();
                         }
                     });
                 }
             });
     },
-    resolveIssueHandler: function(issueId) {
+    resolveIssueHandler: function (issueId) {
         var me = this;
         d3.select('#resolve-issue')
             .attr('title', 'Click here to mark this issue as resolved \nand leave the above text as description')
-            .on('click', function() {
+            .on('click', function () {
                 if (dcc.isQcUser('resolve this issue.')) {
                     var d = document.getElementById('action-detail').value,
                         action = new Ext.create('PhenoDCC.model.Action', {
@@ -1327,22 +1353,24 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                             "lastUpdate": 0 /* doesn't matter: supplied by server */
                         });
                     action.save({
-                        callback: function() {
+                        callback: function () {
                             me.onPipelineChange();
                         }
                     });
                 }
             });
     },
-    displayIssueActions: function(issueId, status) {
-        var me = this, actionsStore = me.getActionsStore();
+    displayIssueActions: function (issueId, status) {
+        var me = this, actionsStore = me.getActionsStore(),
+            parent = d3.select(d3.select('#data-view-actions-panel').node().parentNode);
+        parent.select('.create-new-action-button').remove();
         if (actionsStore) {
             actionsStore.removeAll();
             var proxy = actionsStore.getProxy();
             if (proxy !== null) {
                 proxy.extraParams.issueId = issueId;
                 actionsStore.load({
-                    callback: function() {
+                    callback: function () {
                         var actionsPanel = me.getActionsPanel();
                         if (actionsPanel) {
                             actionsPanel.update(me.prepareActions(actionsStore,
@@ -1351,6 +1379,12 @@ Ext.define('PhenoDCC.controller.QualityControl', {
                                 me.addCommentHandler(issueId);
                                 me.acceptIssueHandler(issueId);
                                 me.resolveIssueHandler(issueId);
+                                parent.append('div')
+                                    .attr('class', 'create-new-action-button')
+                                    .text('+')
+                                    .on('click', function () {
+                                        d3.select('.create-new-action').node().scrollIntoView(true);
+                                    });
                             }
                             me.deleteIssueHandler(issueId);
                         }
@@ -1359,18 +1393,21 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             }
         }
     },
-    onIssueSelect: function(selModel, selection) {
+    onIssueSelect: function (selModel, selection) {
         var me = this;
         dcc.dataContext.raisedByUid = null;
         if (selection !== null && selection.length > 0) {
             var issue = selection[0];
+            if (issue.get('status') !== 'resolved')
+                dcc.visualisationControl = issue.get('controlSetting');
+            dcc.showVisualisationControls();
             dcc.dataContext.raisedByUid = issue.get('raisedByUid');
             dcc.dataContext.iid = issue.get('id');
             me.displayIssueActions(issue.get('id'), issue.get('status'));
             dcc.loadCitedDatapoints();
         }
     },
-    displayHistory: function() {
+    displayHistory: function () {
         if (dcc.dataContext.id === -1) {
             dcc.timeline(null, '#data-view-history-panel');
             this.getHistoryPanel().update('<div class="no-issues">Current data context does not yet have a history</div>');
@@ -1380,7 +1417,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             d3.json('rest/history/' + dcc.dataContext.id
                 + '?u=' + dcc.roles.uid
                 + '&s=' + dcc.roles.ssid,
-                function(data) {
+                function (data) {
                     dcc.timeline(data.history, '#data-view-history-panel');
                 });
         }
@@ -1388,7 +1425,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     /**
      * Generates a query string from the web application state.
      */
-    stateToString: function() {
+    stateToString: function () {
         var context = dcc.dataContext;
         return "cid=" + context.cid
             + "&gid=" + context.gid
@@ -1405,7 +1442,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * procedure and parameter information. This allows the web application
      * to start in a specific state.
      */
-    showBookmark: function() {
+    showBookmark: function () {
         var bookmark = location.protocol + '//'
             + location.host
             + location.pathname
@@ -1422,7 +1459,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      *
      * @param [String] roles An array of roles.
      */
-    isQualityControlUser: function(roles) {
+    isQualityControlUser: function (roles) {
         var i, c = roles.length;
         for (i = 0; i < c; ++i) {
             if ('qc user' === roles[i]) {
@@ -1431,11 +1468,11 @@ Ext.define('PhenoDCC.controller.QualityControl', {
         }
         return false;
     },
-    attachResizeHandler: function() {
+    attachResizeHandler: function () {
         var me = this, chart = me.getSpecimenCentricVisualisationContainer();
         chart.on('resize', dcc.loadMeasurements);
     },
-    detachResizeHandler: function() {
+    detachResizeHandler: function () {
         var me = this, chart = me.getSpecimenCentricVisualisationContainer();
         chart.un('resize', dcc.loadMeasurements);
     },
@@ -1443,10 +1480,10 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Function onLaunch() is invoked when the web application is loaded, after
      * the components have been initialised.
      */
-    onLaunch: function() {
+    onLaunch: function () {
         var me = this, temp, contextDetails;
 
-        dcc.loadMeasurements = function() {
+        dcc.loadMeasurements = function () {
             me.loadMeasurements();
         };
         me.attachResizeHandler();
@@ -1479,13 +1516,13 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             contextDetails.append('div').attr('id', 'context-details-allele');
             contextDetails.append('div').attr('id', 'context-details-strain');
 
-            d3.select('#bookmark-this').on('click', function() {
+            d3.select('#bookmark-this').on('click', function () {
                 me.showBookmark();
             });
-            d3.select('#tracker-link').on('click', function() {
+            d3.select('#tracker-link').on('click', function () {
                 this.href = "../tracker?cid=" + context.cid;
             });
-            d3.select('#login-link').on('click', function() {
+            d3.select('#login-link').on('click', function () {
                 this.href = "../user/login?destination=/qc?"
                     + encodeURIComponent(me.stateToString());
             });

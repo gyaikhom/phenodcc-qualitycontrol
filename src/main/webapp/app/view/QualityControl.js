@@ -96,6 +96,27 @@ Ext.define('PhenoDCC.view.QualityControl', {
                 padding: 5,
                 items: [
                 {
+                    xtype: 'checkboxgroup',
+                    layout: 'hbox',
+                    region: 'north',
+                    listeners: {
+                        change: function(field, newValue, oldValue, eOpts) {
+                            dcc.hideQcTicked = newValue['hide-qc-ticked'];
+                            dcc.extjs.controller.loadGeneStrains();
+                        }
+                    },
+                    items: [
+                        {
+                            boxLabel: 'Hide lines that are QC ticked',
+                            name: 'hide-qc-ticked',
+                            inputValue: true,
+                            checked: false,
+                            id: 'hide-qc-ticked',
+                            style: 'margin-left: 5px'
+                        }
+                    ]
+                },
+                {
                     xtype: 'genestrainstree',
                     id: 'data-view-genestrains-tree',
                     region: 'center',

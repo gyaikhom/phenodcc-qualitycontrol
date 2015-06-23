@@ -1,6 +1,9 @@
 % Users' Manual: _Quality Control Web Application_
 % The PhenoDCC Team (written by Gagarine Yaikhom)
-% Last updated: 21 July 2014
+% Last updated: 23 September 2014
+
+</br>
+<iframe width="800" height="450" src="https://www.youtube.com/embed/ejaJyxmwluE?rel=0" frameborder="0" allowfullscreen></iframe>
 
 <div class="version">This users' manual describes version 2 of the
 _Quality Control Web Application_.</div>
@@ -641,6 +644,31 @@ while discussing specific data remotely.
 To bookmark the current state, click on the _Bookmark_ link at the
 toolbar. This will display a complete link that can be copied and pasted
 as a normal text string, for communication in emails etc.
+
+# Video tutorials
+
+The following are segments from the video tutorial for a few of the most common tasks.
+
+* [Selecting measurements to visualise](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=0m0s)
+* [Interacting with the visualisation](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=0m35s)
+* [Selective display of statistics](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=0m42s)
+* [Hiding wildtype measurements](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=4m34s)
+* [Filtering measurements by zygosity](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=1m6s)
+* [Filtering measurements by gender](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=1m12s)
+* [Display crosshair to get measurements for specific data points](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=0m56s)
+* [Retrieving specimen and experiment details](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=1m17s)
+* [Display history of data evolution and quality control activities](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=1m20s)
+* [Highlight data points that belong to a specimen](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=1m25s)
+* [Selecting data points to raise an issue](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=1m47s)
+* [Clearing a selection of data points](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=1m56s)
+* [Raising a quality control issue](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=2m0s)
+* [View details for a quality control issue](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=3m02s)
+* [Adding a comment to an issue](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=3m21s)
+* [Marking an issue as under investigation](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=3m37s)
+* [Resolving a quality control issue](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=3m50s)
+* [Displaying all of the issues that belong to a centre](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=5m0s)
+* [Marking a parameter as QC done](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=6m1s)
+* [Marking all of the parameters associated with a procedure as QC done](https://www.youtube.com/watch?v=ejaJyxmwluE&feature=youtu.be&t=6m24s)
 
 
 # Understanding the icons

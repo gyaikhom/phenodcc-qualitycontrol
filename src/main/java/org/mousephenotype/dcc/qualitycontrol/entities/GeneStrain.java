@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement
 @XmlType(propOrder = {"id", "cid", "gid", "sid", "geneSymbol", "geneId", "geneName", "alleleName", "strain", "genotype"})
 @NamedQueries({
-    @NamedQuery(name = "GeneStrain.findByCentrePipeline", query = "SELECT new org.mousephenotype.dcc.qualitycontrol.entities.GeneStrain(d.cid, d.gid, d.sid, g.geneSymbol, g.geneId, g.geneName, g.alleleName, s.strain, g.genotype, MAX(d.stateId.cid), SUM(d.numIssues - d.numResolved)) FROM DataContext d, Genotype g, Strain s, Parameter q WHERE (d.cid = :cid AND d.lid = :lid AND d.numMeasurements > 0 AND d.gid = g.genotypeId AND d.sid = s.strainId AND q.parameterId = d.qid AND q.type != 'procedureMetadata' AND q.graphType IS NOT NULL AND (d.qid != 2100 or (d.pid = 103 AND d.qid = 2100))) GROUP BY d.cid, d.gid, d.sid ORDER BY s.strain, g.geneSymbol"),
+    @NamedQuery(name = "GeneStrain.findByCentrePipeline", query = "SELECT new org.mousephenotype.dcc.qualitycontrol.entities.GeneStrain(d.cid, d.gid, d.sid, g.geneSymbol, g.geneId, g.geneName, g.alleleName, s.strain, g.genotype, MAX(d.stateId.cid), SUM(d.numIssues - d.numResolved)) FROM DataContext d join Genotype g on (d.gid = g.genotypeId) join Strain s on (d.sid = s.strainId) join Parameter q on (q.parameterId = d.qid) left join IgnoreProcedures ip on (ip.procedureId = d.pid) WHERE (d.cid = :cid AND d.lid = :lid AND d.numMeasurements > 0 AND q.graphType IS NOT NULL and ip.procedureId is null AND (d.qid != 2100 or (d.pid = 103 AND d.qid = 2100)) AND q.type != 'procedureMetadata') GROUP BY d.cid, d.gid, d.sid ORDER BY s.strain, g.geneSymbol"),
 })
 public class GeneStrain implements Serializable {
     private static final long serialVersionUID = 1L;

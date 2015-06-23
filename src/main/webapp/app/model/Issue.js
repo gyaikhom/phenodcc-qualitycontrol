@@ -35,6 +35,10 @@ Ext.define('PhenoDCC.model.Issue', {
         name: 'priority'
     },
     {
+        name: 'controlSetting',
+        type: 'int'
+    },
+    {
         name: 'status'
     },
     {

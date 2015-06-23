@@ -124,7 +124,8 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
             @QueryParam("sort") String sort,
             @QueryParam("start") Integer start,
             @QueryParam("limit") Integer limit,
-            @QueryParam("q") String specimenQuery,
+            @QueryParam("n") String specimenNameQuery,
+            @QueryParam("a") String specimenIdQuery,
             @QueryParam("s") String sessionId,
             @QueryParam("u") Integer userId) {
         ProcedureSpecimenPack t = new ProcedureSpecimenPack();
@@ -191,10 +192,15 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
             // add an additional criteria to match the two tables.
             p = cb.and(cb.equal(pao.get("animalId"), ao.get("animalId")), p);
 
-            // Search for specimen
-            if (specimenQuery != null) {
-                p = cb.and(cb.like(pao.<String>get("animalName"),
-                        "%" + specimenQuery + "%"), p);
+            // Search for specimen by id
+            if (specimenIdQuery != null) {
+                p = cb.and(cb.equal(pao.get("animalId"), specimenIdQuery), p);
+            } else {
+                if (specimenNameQuery != null) {
+                    // Search for specimen by name
+                    p = cb.and(cb.like(pao.<String>get("animalName"),
+                            "%" + specimenNameQuery + "%"), p);
+                }
             }
             cq.where(p);
 

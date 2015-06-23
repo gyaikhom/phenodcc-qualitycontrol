@@ -52,6 +52,7 @@ public class HistoryFacadeREST extends AbstractFacade<HistoryEntry> {
         HistoryPack p = new HistoryPack();
         if (isValidSession(sessionId, userId)) {
             EntityManager em = getEntityManager();
+            EntityManager drupalEm = getDrupalEntityManager();
             TypedQuery<HistoryEntry> q = em.createNamedQuery(
                     "History.findByContextId", HistoryEntry.class);
             q.setParameter("contextId", contextId);
@@ -59,7 +60,7 @@ public class HistoryFacadeREST extends AbstractFacade<HistoryEntry> {
             Iterator<HistoryEntry> i = temp.iterator();
             while (i.hasNext()) {
                 HistoryEntry h = i.next();
-                AUser actionedBy = em.find(AUser.class, h.getActionedBy());
+                AUser actionedBy = drupalEm.find(AUser.class, h.getActionedBy());
                 String user;
                 if (h.getActionedBy() == -1) {
                     user = "Crawler";
@@ -71,6 +72,7 @@ public class HistoryFacadeREST extends AbstractFacade<HistoryEntry> {
             }
             p.setDataSet(temp);
             em.close();
+            drupalEm.close();
         } else {
             p.sessionHasExpired();
         }

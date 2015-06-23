@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.mousephenotype.dcc.entities.overviews.MeasuredValues;
+import org.mousephenotype.dcc.entities.overviews.MetadataGroupToValues;
 
 /**
  *
@@ -28,6 +29,16 @@ import org.mousephenotype.dcc.entities.overviews.MeasuredValues;
 @XmlSeeAlso(MeasuredValues.class)
 @XmlType(propOrder = {"success", "total", "measurements"})
 public class MeasurementsPack extends AbstractRestResponse<MeasuredValues> {
+
+    private List<MetadataGroupToValues> metadataGroups;
+
+    public List<MetadataGroupToValues> getMetadataGroups() {
+        return metadataGroups;
+    }
+
+    public void setMetadataGroups(List<MetadataGroupToValues> metadataGroups) {
+        this.metadataGroups = metadataGroups;
+    }
 
     @Override
     @XmlElement(name = "measurements")

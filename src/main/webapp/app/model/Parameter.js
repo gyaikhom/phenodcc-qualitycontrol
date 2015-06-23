@@ -100,6 +100,10 @@ Ext.define('PhenoDCC.model.Parameter', {
     {
         name: 'r',
         type: 'int'
+    },
+    {
+        name: 'o',
+        type: 'Array'
     }
     ],
     requires: [

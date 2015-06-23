@@ -223,6 +223,7 @@ public class DataContextFacadeREST extends AbstractFacade<DataContext> {
         if (isValidSession(sessionId, userId)) {
             p.setDataSet(null, 0L);
             EntityManager em = getEntityManager();
+            EntityManager drupalEm = getDrupalEntityManager();
             DataContext dc = em.find(DataContext.class, contextId);
             if (dc != null) {
                 TypedQuery<HistoryEntry> query
@@ -238,16 +239,17 @@ public class DataContextFacadeREST extends AbstractFacade<DataContext> {
                     if (e.getActionedBy() == -1) {
                         username = "crawler";
                     } else {
-                        AUser u = em.find(AUser.class, e.getActionedBy());
+                        AUser u = drupalEm.find(AUser.class, e.getActionedBy());
                         if (u == null) {
                             username = "unknown";
                         }
                     }
-                    e.setUser(username.toString());
+                    e.setUser(username);
                 }
                 p.setDataSet(entries);
-                em.close();
             }
+                em.close();
+            drupalEm.close();
         } else {
             p.sessionHasExpired();
         }

@@ -31,6 +31,7 @@ public class AnIssueResponse implements Serializable {
     @Id
     private Long id;
     private String priority;
+    private Integer controlSetting;
     private String status;
     private String raisedBy;
     private Integer raisedByUid;
@@ -48,14 +49,15 @@ public class AnIssueResponse implements Serializable {
     }
 
     public AnIssueResponse(Long id, String title, String description,
-            String priority, String status, String raisedBy,
-            Integer raisedByUid, String assignedTo, Long lastUpdate,
-            DataContext context, String peid, String procedure,
+            String priority, Integer controlSetting, String status,
+            String raisedBy, Integer raisedByUid, String assignedTo,
+            Long lastUpdate, DataContext context, String peid, String procedure,
             String qeid, String parameter) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.priority = priority;
+        this.controlSetting = controlSetting;
         this.status = status;
         this.raisedBy = raisedBy;
         this.raisedByUid = raisedByUid;
@@ -98,6 +100,14 @@ public class AnIssueResponse implements Serializable {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    public Integer getControlSetting() {
+        return controlSetting;
+    }
+
+    public void setControlSetting(Integer controlSetting) {
+        this.controlSetting = controlSetting;
     }
 
     public String getStatus() {

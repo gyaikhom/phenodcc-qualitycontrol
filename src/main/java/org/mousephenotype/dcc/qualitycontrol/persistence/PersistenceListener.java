@@ -15,6 +15,7 @@
  */
 package org.mousephenotype.dcc.qualitycontrol.persistence;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -26,10 +27,21 @@ public class PersistenceListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
+        ServletContext ctx = event.getServletContext();
+        PersistenceManager pm
+                = (PersistenceManager) ctx.getAttribute("PersistenceManager");
+        if (pm == null) {
+            ctx.setAttribute("PersistenceManager", new PersistenceManager());
+    }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        PersistenceManager.getInstance().closeEntityManagerFactory();
+        ServletContext ctx = event.getServletContext();
+        PersistenceManager pm
+                = (PersistenceManager) ctx.getAttribute("PersistenceManager");
+        pm.closeEntityManagerFactory();
+        pm.closeDrupalEntityManagerFactory();
+        ctx.removeAttribute("PersistenceManager");
     }
 }

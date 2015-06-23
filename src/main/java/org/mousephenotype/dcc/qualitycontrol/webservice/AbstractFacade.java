@@ -21,6 +21,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import org.mousephenotype.dcc.entities.qc.AUser;
 import org.mousephenotype.dcc.entities.qc.Sessions;
 import org.mousephenotype.dcc.qualitycontrol.persistence.PersistenceManager;
@@ -31,6 +33,8 @@ import org.mousephenotype.dcc.qualitycontrol.persistence.PersistenceManager;
  */
 public abstract class AbstractFacade<T> {
 
+    @Context
+    private ServletContext context;
     private Class<T> entityClass;
 
     public AbstractFacade(Class<T> entityClass) {
@@ -38,7 +42,17 @@ public abstract class AbstractFacade<T> {
     }
 
     protected EntityManager getEntityManager() {
-        EntityManagerFactory emf = PersistenceManager.getInstance().getEntityManagerFactory();
+        PersistenceManager pm
+                = (PersistenceManager) context.getAttribute("PersistenceManager");
+        EntityManagerFactory emf = pm.getEntityManagerFactory();
+        emf.getCache().evictAll();
+        return emf.createEntityManager();
+    }
+
+    protected EntityManager getDrupalEntityManager() {
+        PersistenceManager pm
+                = (PersistenceManager) context.getAttribute("PersistenceManager");
+        EntityManagerFactory emf = pm.getDrupalEntityManagerFactory();
         emf.getCache().evictAll();
         return emf.createEntityManager();
     }
@@ -114,7 +128,7 @@ public abstract class AbstractFacade<T> {
     public boolean isValidSession(String sessionId, Integer userId) {
         boolean returnValue = false;
         if (sessionId != null && !sessionId.isEmpty()) {
-            EntityManager em = getEntityManager();
+            EntityManager em = getDrupalEntityManager();
             AUser user = em.find(AUser.class, userId);
             if (user != null) {
                 TypedQuery<Sessions> sessionsQuery =

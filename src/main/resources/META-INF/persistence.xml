@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-    <persistence-unit name="org.mousephenotype.dcc.qualitycontrol.entities.pu" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="org.mousephenotype.dcc.qualitycontrol.entities.qc.pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- we need entities in the IMPReSS entities packages -->
+        <class>org.mousephenotype.dcc.entities.impress.IgnoreProcedures</class>
         <class>org.mousephenotype.dcc.entities.impress.ParamIncrement</class>
         <class>org.mousephenotype.dcc.entities.impress.ParamMpterm</class>
         <class>org.mousephenotype.dcc.entities.impress.ParamOption</class>
@@ -24,6 +25,8 @@
         <class>org.mousephenotype.dcc.entities.overviews.MeasurementsPerformed</class>
         <class>org.mousephenotype.dcc.entities.overviews.ProceduresPerformed</class>
         <class>org.mousephenotype.dcc.entities.overviews.ProcedureAnimalOverview</class>
+        <class>org.mousephenotype.dcc.entities.overviews.MetadataGroupToValues</class>
+        <class>org.mousephenotype.dcc.entities.overviews.ProcedureMetadataGroup</class>
 
         <!-- we need entities in the Quality Control entities packages -->
         <class>org.mousephenotype.dcc.entities.qc.IssueStatus</class>
@@ -31,9 +34,7 @@
         <class>org.mousephenotype.dcc.entities.qc.AnIssue</class>
         <class>org.mousephenotype.dcc.entities.qc.AnAction</class>
         <class>org.mousephenotype.dcc.entities.qc.ActionType</class>
-        <class>org.mousephenotype.dcc.entities.qc.AUser</class>
         <class>org.mousephenotype.dcc.entities.qc.CitedDataPoint</class>
-        <class>org.mousephenotype.dcc.entities.qc.Sessions</class>
         <class>org.mousephenotype.dcc.entities.qc.History</class>
         <class>org.mousephenotype.dcc.entities.qc.AState</class>
 
@@ -79,7 +80,19 @@
         <class>org.mousephenotype.dcc.qualitycontrol.entities.MeasuredValues</class>
         <class>org.mousephenotype.dcc.entities.overviews.HistoryEntry</class>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="${db.url}"/>
+            <property name="javax.persistence.jdbc.url" value="${db.qc}"/>
+            <property name="javax.persistence.jdbc.driver" value="${db.driver}"/>
+            <property name="javax.persistence.jdbc.user" value="${db.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${db.password}"/>
+            <property name="eclipselink.cache.shared.default" value="false"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="org.mousephenotype.dcc.qualitycontrol.entities.drupal.pu" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>org.mousephenotype.dcc.entities.qc.AUser</class>
+        <class>org.mousephenotype.dcc.entities.qc.Sessions</class>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="${db.drupal}"/>
             <property name="javax.persistence.jdbc.driver" value="${db.driver}"/>
             <property name="javax.persistence.jdbc.user" value="${db.user}"/>
             <property name="javax.persistence.jdbc.password" value="${db.password}"/>

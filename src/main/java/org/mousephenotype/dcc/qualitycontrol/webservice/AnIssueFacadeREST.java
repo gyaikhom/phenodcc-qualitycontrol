@@ -37,8 +37,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.eclipse.persistence.exceptions.DatabaseException;
-import org.mousephenotype.dcc.qualitycontrol.entities.AnIssueRequest;
-import org.mousephenotype.dcc.qualitycontrol.entities.AnIssueResponse;
 import org.mousephenotype.dcc.entities.impress.Parameter;
 import org.mousephenotype.dcc.entities.impress.Procedure;
 import org.mousephenotype.dcc.entities.overviews.MeasurementsPerformed;
@@ -49,6 +47,8 @@ import org.mousephenotype.dcc.entities.qc.AnIssue;
 import org.mousephenotype.dcc.entities.qc.CitedDataPoint;
 import org.mousephenotype.dcc.entities.qc.DataContext;
 import org.mousephenotype.dcc.entities.qc.History;
+import org.mousephenotype.dcc.qualitycontrol.entities.AnIssueRequest;
+import org.mousephenotype.dcc.qualitycontrol.entities.AnIssueResponse;
 import org.mousephenotype.dcc.qualitycontrol.webservice.pack.AnIssuePack;
 
 /**
@@ -188,13 +188,16 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
         return animalId;
     }
 
-    private AUser getUser(Integer id, EntityManager em) {
+    private AUser getUser(Integer id) {
+        EntityManager em = getDrupalEntityManager();
         AUser r = null;
         try {
             r = em.find(AUser.class, id);
         } catch (Exception e) {
             System.err.println("Unable to find user with id "
                     + id + " in Drupal database.");
+        } finally {
+            em.close();
         }
         return r;
     }
@@ -234,8 +237,8 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
             DataContext dc = issue.getContextId();
             Procedure p = getProcedure(dc.getPid(), em);
             Parameter q = getParameter(dc.getQid(), em);
-            AUser raisedBy = getUser(issue.getRaisedBy(), em);
-            AUser assignedTo = getUser(issue.getAssignedTo(), em);
+            AUser raisedBy = getUser(issue.getRaisedBy());
+            AUser assignedTo = getUser(issue.getAssignedTo());
 
             if (p == null || q == null
                     || raisedBy == null || assignedTo == null) {
@@ -244,6 +247,7 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
                 r = new AnIssueResponse(
                         issue.getId(), issue.getTitle(),
                         action.getDescription(), issue.getPriorityString(),
+                        issue.getControlSetting(),
                         issue.getStatus().getShortName(),
                         raisedBy.toString(), raisedBy.getUid(),
                         assignedTo.toString(),

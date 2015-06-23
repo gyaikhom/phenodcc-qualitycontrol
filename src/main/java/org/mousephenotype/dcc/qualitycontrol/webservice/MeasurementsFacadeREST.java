@@ -15,6 +15,9 @@
  */
 package org.mousephenotype.dcc.qualitycontrol.webservice;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -23,7 +26,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import org.mousephenotype.dcc.crawler.entities.XmlFile;
 import org.mousephenotype.dcc.entities.overviews.MeasuredValues;
-import org.mousephenotype.dcc.entities.overviews.ProcedureAnimalOverview;
+import org.mousephenotype.dcc.entities.overviews.MetadataGroupToValues;
+import org.mousephenotype.dcc.entities.overviews.ProcedureMetadataGroup;
 import org.mousephenotype.dcc.qualitycontrol.webservice.pack.MeasurementsPack;
 
 /**
@@ -46,73 +50,131 @@ public class MeasurementsFacadeREST extends AbstractFacade<MeasuredValues> {
             String procedureKey,
             String parameterKey) {
         EntityManager em = getEntityManager();
-        TypedQuery<MeasuredValues> query
-                = em.createNamedQuery(
-                        "MeasurementsPerformed.findMutantMeasurements",
-                        MeasuredValues.class);
-        query.setParameter("centreId", centreId);
-        query.setParameter("pipelineId", pipelineId);
-        query.setParameter("genotypeId", genotypeId);
-        query.setParameter("strainId", strainId);
-        query.setParameter("procedureKey", procedureKey);
-        query.setParameter("parameterKey", parameterKey);
-        List<MeasuredValues> temp = query.getResultList();
-        for (MeasuredValues m : temp) {
-            XmlFile xf = em.find(XmlFile.class, m.getTrackerId());
-            if (xf != null) {
-                m.setLastModified(xf.getLastUpdate());
+        List<MeasuredValues> temp = null;
+        try {
+            TypedQuery<MeasuredValues> query
+                    = em.createNamedQuery(
+                            "MeasurementsPerformed.findMutantMeasurements",
+                            MeasuredValues.class);
+            query.setParameter("centreId", centreId);
+            query.setParameter("pipelineId", pipelineId);
+            query.setParameter("genotypeId", genotypeId);
+            query.setParameter("strainId", strainId);
+            query.setParameter("procedureKey", procedureKey);
+            query.setParameter("parameterKey", parameterKey);
+            temp = query.getResultList();
+            for (MeasuredValues m : temp) {
+                XmlFile xf = em.find(XmlFile.class, m.getTrackerId());
+                if (xf != null) {
+                    m.setLastModified(xf.getLastUpdate());
+                }
             }
+            em.close();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
-        em.close();
         return temp;
     }
 
     private List<MeasuredValues> getBaselineMeasurements(
-            ProcedureAnimalOverview pao,
-            String procedureKey,
-            String parameterKey) {
+            Integer centreId,
+            Integer strainId,
+            String parameterKey,
+            ProcedureMetadataGroup t) {
         EntityManager em = getEntityManager();
-        TypedQuery<MeasuredValues> query
-                = em.createNamedQuery(
-                        "MeasurementsPerformed.findBaselineMeasurements",
-                        MeasuredValues.class);
-        query.setParameter("centreId", pao.getCentreId());
-        query.setParameter("pipeline", pao.getPipeline());
-        query.setParameter("strainId", pao.getStrainId());
-        query.setParameter("procedureId", procedureKey);
-        query.setParameter("parameterId", parameterKey);
-        query.setParameter("metadataGroup", pao.getMetadataGroup());
-        List<MeasuredValues> temp = query.getResultList();
-        for (MeasuredValues m : temp) {
-            XmlFile xf = em.find(XmlFile.class, m.getTrackerId());
-            if (xf != null) {
-                m.setLastModified(xf.getLastUpdate());
+        List<MeasuredValues> temp = null;
+        try {
+            TypedQuery<MeasuredValues> query
+                    = em.createNamedQuery(
+                            "MeasurementsPerformed.findBaselineMeasurements",
+                            MeasuredValues.class);
+            query.setParameter("centreId", centreId);
+            query.setParameter("pipeline", t.getPipeline());
+            query.setParameter("strainId", strainId);
+            query.setParameter("procedureId", t.getProcedureId());
+            query.setParameter("parameterId", parameterKey);
+            query.setParameter("metadataGroup", t.getMetadataGroup());
+            temp = query.getResultList();
+            for (MeasuredValues m : temp) {
+                XmlFile xf = em.find(XmlFile.class, m.getTrackerId());
+                if (xf != null) {
+                    m.setLastModified(xf.getLastUpdate());
+                }
             }
+            em.close();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
-        em.close();
         return temp;
     }
 
-    public ProcedureAnimalOverview getProcedureAnimalOverview(
-            Integer centreId, Integer pipelineId, Integer genotypeId,
-            Integer strainId, String parameterId) {
-        ProcedureAnimalOverview pao = null;
+    private MetadataGroupToValues getMetadataGroupValue(String mg) {
+        MetadataGroupToValues v = null;
         EntityManager em = getEntityManager();
-        TypedQuery<ProcedureAnimalOverview> q
-                = em.createNamedQuery("ProcedureAnimalOverview.findByCidLidGidSidQeid",
-                        ProcedureAnimalOverview.class);
+        try {
+            TypedQuery<MetadataGroupToValues> query
+                    = em.createNamedQuery(
+                            "MetadataGroupToValues.findByMetadataGroup",
+                            MetadataGroupToValues.class);
+            query.setParameter("metadataGroup", mg);
+            query.setMaxResults(1);
+            v = query.getSingleResult();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        em.close();
+        return v;
+    }
+
+    // We do not wish to send the meta-data group checksum or the values
+    // for every measurement. So, we group all of the distinct meta-data groups
+    // and send them with the measurements. Within each measurement, we replace
+    // the meta-data group checksum with the id.
+    private List<MetadataGroupToValues> convertMetadataGroupsToIndices(List<MeasuredValues> g) {
+        List<MetadataGroupToValues> mgs = new ArrayList<>();
+        HashMap<String, MetadataGroupToValues> distinct = new HashMap<>();
+        Iterator<MeasuredValues> i = g.iterator();
+        while (i.hasNext()) {
+            MeasuredValues v = i.next();
+            String checksum = v.getMetadataGroup();
+            MetadataGroupToValues mg = distinct.get(checksum);
+            if (mg == null) {
+                mg = getMetadataGroupValue(checksum);
+                if (mg != null) {
+                    distinct.put(checksum, mg);
+                    mgs.add(mg);
+                }
+            }
+            v.setMetadataGroupIndex(mg == null
+                    ? -1L : mg.getMetadataGroupToValuesId());
+        }
+        return mgs;
+    }
+
+    public List<ProcedureMetadataGroup> getProcedureMetadataGroups(
+            Integer centreId,
+            Integer pipelineId,
+            Integer genotypeId,
+            Integer strainId,
+            String procedureKey,
+            String parameterKey) {
+        List<ProcedureMetadataGroup> t = null;
+        EntityManager em = getEntityManager();
+        TypedQuery<ProcedureMetadataGroup> q
+                = em.createNamedQuery("ProcedureAnimalOverview.findByCidLidGidSidPeidQeid",
+                        ProcedureMetadataGroup.class);
         q.setParameter("centreId", centreId);
         q.setParameter("pipelineId", pipelineId);
         q.setParameter("genotypeId", genotypeId);
         q.setParameter("strainId", strainId);
-        q.setParameter("parameterId", parameterId);
-        q.setMaxResults(1);
+        q.setParameter("procedureId", procedureKey);
+        q.setParameter("parameterId", parameterKey);
         try {
-            pao = q.getSingleResult();
+            t = q.getResultList();
         } catch (Exception e) {
         }
         em.close();
-        return pao;
+        return t;
     }
 
     @GET
@@ -136,18 +198,25 @@ public class MeasurementsFacadeREST extends AbstractFacade<MeasuredValues> {
                     || parameterKey == null || parameterKey.isEmpty()) {
                 p.setDataSet(null, 0L);
             } else {
-                ProcedureAnimalOverview pao
-                        = getProcedureAnimalOverview(centreId, pipelineId,
-                                genotypeId, strainId, parameterKey);
-                if (pao == null) {
+                List<ProcedureMetadataGroup> t = getProcedureMetadataGroups(
+                        centreId, pipelineId, genotypeId, strainId,
+                        procedureKey, parameterKey);
+                if (t == null || t.isEmpty()) {
                     p.setDataSet(null, 0L);
                 } else {
                     List<MeasuredValues> temp
                             = getMutantMeasurements(centreId, pipelineId,
-                                    genotypeId, strainId, procedureKey, parameterKey);
+                                    genotypeId, strainId,
+                                    t.get(0).getProcedureId(), parameterKey);
                     if (genotypeId != 0 && includeBaseline != null && includeBaseline) {
-                        temp.addAll(getBaselineMeasurements(pao, procedureKey, parameterKey));
+                        Iterator<ProcedureMetadataGroup> i = t.iterator();
+                        while (i.hasNext()) {
+                            temp.addAll(getBaselineMeasurements(centreId,
+                                    strainId, parameterKey, i.next()));
+                        }
                     }
+                    List<MetadataGroupToValues> mgs = convertMetadataGroupsToIndices(temp);
+                    p.setMetadataGroups(mgs);
                     p.setDataSet(temp);
                 }
             }

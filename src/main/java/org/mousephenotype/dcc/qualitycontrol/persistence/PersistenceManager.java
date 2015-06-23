@@ -25,14 +25,11 @@ import javax.persistence.Persistence;
 public class PersistenceManager {
 
     protected EntityManagerFactory emf;
-    private static final String persistenceUnit = "org.mousephenotype.dcc.qualitycontrol.entities.pu";
-    private static final PersistenceManager instance = new PersistenceManager();
+    protected EntityManagerFactory drupalEmf;
 
-    public static PersistenceManager getInstance() {
-        return instance;
-    }
-
-    private PersistenceManager() {
+    private static final String persistenceUnit = "org.mousephenotype.dcc.qualitycontrol.entities.qc.pu";
+    private static final String drupalPersistenceUnit = "org.mousephenotype.dcc.qualitycontrol.entities.drupal.pu";
+    public PersistenceManager() {
     }
 
     public EntityManagerFactory getEntityManagerFactory() {
@@ -40,6 +37,13 @@ public class PersistenceManager {
             createEntityManagerFactory();
         }
         return emf;
+    }
+
+    public EntityManagerFactory getDrupalEntityManagerFactory() {
+        if (drupalEmf == null) {
+            createDrupalEntityManagerFactory();
+        }
+        return drupalEmf;
     }
 
     public void closeEntityManagerFactory() {
@@ -52,10 +56,27 @@ public class PersistenceManager {
         }
     }
 
+    public void closeDrupalEntityManagerFactory() {
+        if (drupalEmf != null) {
+            drupalEmf.close();
+            drupalEmf = null;
+            System.out.println("Drupal persistence unit '"
+                    + drupalPersistenceUnit
+                    + "' was closed at " + new java.util.Date());
+        }
+    }
+
     protected void createEntityManagerFactory() {
         emf = Persistence.createEntityManagerFactory(persistenceUnit);
         System.out.println("Persistence unit '"
                 + persistenceUnit
                 + "' was created at " + new java.util.Date());
     }
+
+    protected void createDrupalEntityManagerFactory() {
+        drupalEmf = Persistence.createEntityManagerFactory(drupalPersistenceUnit);
+        System.out.println("Drupal persistence unit '"
+                + drupalPersistenceUnit
+                + "' was created at " + new java.util.Date());
+}
 }

@@ -37,6 +37,7 @@ public class AnIssueRequest implements Serializable {
     @Id
     private Long id;
     private Short priority;
+    private Integer controlSetting;
     private Integer status;
     private Long contextId;
     private String raisedBy;
@@ -65,6 +66,7 @@ public class AnIssueRequest implements Serializable {
         issue.setContextId(em.find(DataContext.class, contextId));
         issue.setTitle(title);
         issue.setPriority(priority);
+        issue.setControlSetting(controlSetting);
         issue.setStatus(getIssueStatus(em, status));
         issue.setRaisedBy(raisedByUid);
         issue.setAssignedTo(assignedTo);
@@ -118,6 +120,14 @@ public class AnIssueRequest implements Serializable {
 
     public void setPriority(Short priority) {
         this.priority = priority;
+    }
+
+    public Integer getControlSetting() {
+        return controlSetting;
+    }
+
+    public void setControlSetting(Integer controlSetting) {
+        this.controlSetting = controlSetting;
     }
 
     public Integer getStatus() {

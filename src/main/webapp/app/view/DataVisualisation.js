@@ -75,18 +75,37 @@ Ext.define('PhenoDCC.view.DataVisualisation', {
                                     {
                                         xtype: 'form',
                                         region: 'north',
-                                        height: 40,
-                                        style: 'padding-top: 10px;',
                                         items: {
-                                            xtype: 'textfield',
-                                            fieldLabel: 'Search specimen',
+                                            xtype: 'container',
+                                            layout: 'border',
+                                            border: 0,
                                             width: 500,
-                                            listeners: {
-                                                change: function(field, newValue, oldValue, eOpts) {
-                                                    dcc.specimenSearchQuery = newValue;
-                                                    dcc.throttle(dcc.extjs.controller.searchForSpecimen, 500, dcc.extjs.controller);
+                                            height: 40,
+                                            style: 'padding: 10px;',
+                                            items: [
+                                                {
+                                                    xtype: 'textfield',
+                                                    id: 'specimen-search-field',
+                                                    fieldLabel: 'Search specimen',
+                                                    region: 'center',
+                                                    listeners: {
+                                                        change: function (field, newValue, oldValue, eOpts) {
+                                                            dcc.specimenNameQuery = newValue;
+                                                            dcc.throttle(dcc.extjs.controller.searchForSpecimen, 500, dcc.extjs.controller);
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    xtype: 'button',
+                                                    text: 'Clear',
+                                                    region: 'east',
+                                                    style: 'margin-left: 10px;',
+                                                    handler: function () {
+                                                        dcc.specimenNameQuery = '';
+                                                        this.up('form').getForm().reset();
+                                                    }
                                                 }
-                                            }
+                                            ]
                                         }
                                     },
                                     {
@@ -95,6 +114,11 @@ Ext.define('PhenoDCC.view.DataVisualisation', {
                                         region: 'center'
                                     }
                                 ]
+                            },
+                            {
+                                xtype: 'panel',
+                                title: 'Metadata details',
+                                id: 'data-view-metadata-panel'
                             },
                             {
                                 xtype: 'container',

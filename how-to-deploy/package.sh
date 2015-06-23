@@ -48,7 +48,7 @@ project=`basename ${src_dir}`;
 case $2 in
     localhost) type=1
         ;;
-    prince) type=2
+    prince_dev) type=2
         ;;
     sandbox) type=3
         ;;
@@ -58,10 +58,12 @@ case $2 in
         ;;
     dev) type=6
         ;;
+    live_110) type=7
+        ;;
     *)
         echo "Please specify the build target."
         echo ""
-        echo "    USAGE: package.sh source_dir [localhost | prince | sandbox | beta | live | dev]"
+        echo "    USAGE: package.sh source_dir [localhost | prince_dev | sandbox | beta | live | live_110 | dev]"
         exit
         ;;
 esac

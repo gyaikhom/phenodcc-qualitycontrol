@@ -108,7 +108,8 @@ Ext.define('PhenoDCC.view.ProcedureSpecimens', {
                         text: "Experimenter",
                         dataIndex: 'e',
                         align: 'right',
-                        sortable: true
+                        sortable: true,
+                        hidden: true
                     },
                     {
                         text: "Start data",
@@ -126,7 +127,8 @@ Ext.define('PhenoDCC.view.ProcedureSpecimens', {
                     {
                         text: "Name",
                         dataIndex: 'en',
-                        sortable: true
+                        sortable: true,
+                        hidden: true
                     },
                     {
                         text: "Model",

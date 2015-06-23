@@ -18,6 +18,7 @@ package org.mousephenotype.dcc.qualitycontrol.webservice;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -31,14 +32,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import org.eclipse.persistence.exceptions.DatabaseException;
-import org.mousephenotype.dcc.qualitycontrol.entities.AnActionRequest;
-import org.mousephenotype.dcc.qualitycontrol.entities.AnActionResponse;
 import org.mousephenotype.dcc.entities.qc.AUser;
 import org.mousephenotype.dcc.entities.qc.AnAction;
 import org.mousephenotype.dcc.entities.qc.AnIssue;
 import org.mousephenotype.dcc.entities.qc.DataContext;
 import org.mousephenotype.dcc.entities.qc.History;
 import org.mousephenotype.dcc.entities.qc.IssueStatus;
+import org.mousephenotype.dcc.qualitycontrol.entities.AnActionRequest;
+import org.mousephenotype.dcc.qualitycontrol.entities.AnActionResponse;
 import org.mousephenotype.dcc.qualitycontrol.webservice.pack.AnActionPack;
 
 /**
@@ -78,9 +79,9 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
             Integer actionType = request.getActionType();
             Integer issueStatus = -1;
 
-            if (actionType == ACCEPT_ISSUE) {
+            if (Objects.equals(actionType, ACCEPT_ISSUE)) {
                 issueStatus = ISSUE_ACCEPTED;
-            } else if (actionType == RESOLVE_ISSUE) {
+            } else if (Objects.equals(actionType, RESOLVE_ISSUE)) {
                 issueStatus = ISSUE_RESOLVED;
             }
 
@@ -95,7 +96,7 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
                     AnIssue issue = action.getIssueId();
                     issue.setStatus(status);
 
-                    if (actionType == RESOLVE_ISSUE
+                    if (Objects.equals(actionType, RESOLVE_ISSUE)
                             && context.getNumIssues() > context.getNumResolved()) {
                         context.setNumResolved(context.getNumResolved() + 1);
                     }
@@ -172,7 +173,7 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
         AnAction action = null;
         if (isValidSession(sessionId, userId)) {
             EntityManager em = getEntityManager();
-            if (request.getActionType() == DELETE_ISSUE) {
+            if (Objects.equals(request.getActionType(), DELETE_ISSUE)) {
                 action = markIssueAsDeleted(userId, request, em);
             } else {
                 action = doAction(userId, request, em);
@@ -182,13 +183,16 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
         return action;
     }
 
-    private AUser getUser(Integer id, EntityManager em) {
+    private AUser getUser(Integer id) {
+        EntityManager em = getDrupalEntityManager();
         AUser r = null;
         try {
             r = em.find(AUser.class, id);
         } catch (Exception e) {
             System.err.println("Unable to find user with id "
                     + id + " in Drupal database.");
+        } finally {
+            em.close();
         }
         return r;
     }
@@ -197,7 +201,7 @@ public class AnActionFacadeREST extends AbstractFacade<AnAction> {
         AnActionResponse returnValue = null;
         if (action != null) {
             EntityManager em = getEntityManager();
-            AUser actionedBy = getUser(action.getActionedBy(), em);
+            AUser actionedBy = getUser(action.getActionedBy());
             if (actionedBy == null) {
                 System.err.println("Failed to retrieve action details from database");
             } else {
