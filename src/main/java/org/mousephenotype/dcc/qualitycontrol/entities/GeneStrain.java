@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author Gagarine Yaikhom <g.yaikhom@har.mrc.ac.uk>
  */
 @Entity
-@Table(name = "gene_strain")
+@Table(name = "genotype", catalog = "phenodcc_overviews")
 @XmlRootElement
 @XmlType(propOrder = {"id", "cid", "gid", "sid", "geneSymbol", "geneId", "geneName", "alleleName", "strain", "genotype"})
 @NamedQueries({

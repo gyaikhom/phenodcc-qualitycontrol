@@ -278,15 +278,15 @@ html, body, #app-loading {
 .x-grid-cell-inner {
     font-size: 13px;
     font-family: "Source Sans Pro";
-    font-weight: 400;
+    /* font-weight: 400; */
     font-size: 13px;
 }
 
 .x-grid-row-selected .x-grid-cell,
 .x-grid-row-selected .x-grid-rowwrap-div {
     border: 0;
-    background: rgba(9, 120, 161, 1) !important;
-    color: white !important;
+    /* background: rgba(9, 120, 161, 1) !important; */
+    /* color: white !important; */
 }
 
 .x-grid-row .x-grid-cell {
@@ -1308,7 +1308,7 @@ circle {
 
 #data-view-specimens-qc-panel_header_hd-textEl,
 #gene-strain-procedure-parameter-container_header_hd-textEl {
-    color: #999;
+    color: #555;
     font-size: 13px;
     font-weight: normal;
 }
@@ -3115,11 +3115,6 @@ circle.female.to-select
     text-anchor: middle;
 }
 
-.x-grid-row-selected .allele-name {
-    color: #ff0;
-}
-
-
 .mutant-datapoints text.male,
 .mutant-datapoints text.female,
 .wildtype-datapoints text.male,
@@ -3201,4 +3196,82 @@ text.male.to-select,
 text.female.to-select {
     fill: lime;
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.tabular-table-container {    
+    overflow: auto;
+}
+
+.tabular-table-container table,
+.tabular-table-header table {
+    width: 100%;
+    font-size: 14px;
+    border-collapse: collapse;
+    table-layout:fixed;
+}
+
+.tabular-table-header table {
+    background: #ddd;
+    border-top: 1px solid #c0c0c0;
+    border-bottom: 1px solid #c0c0c0;
+}
+
+.tabular-table-header th,
+.tabular-table-container td {
+    width: 40%;
+    padding: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: left;
+    color: #222;
+}
+.tabular-table-header th:first-child,
+.tabular-table-container td:first-child {
+    width: 110px;
+}
+.tabular-table-header th:last-child,
+.tabular-table-container td:last-child {
+    width: 130px;
+}
+
+.tabular-table-container table tbody tr.odd {
+    background: #eee;
+}
+
+.tabular-stage {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+    padding-top: 0px;
+    color: #000;
+}
+
+.tabular-stage span:first-child {
+    color: #555;
+    margin-right: 5px;
+}
+
+.tabular-title {
+    font-size: 15px;    
+    color: #333;
+    text-align: center;
+    padding: 15px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.tabular-title span:first-child {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.x-grid-row-focused .x-grid-cell,
+.x-grid-row-focused .x-grid-rowwrap-div,
+.x-grid-row-selected .x-grid-cell,
+.x-grid-row-selected .x-grid-rowwrap-div {
+    background-image: url('../images/hilite.png') !important;
+}
+
+.x-grid-row-selected .x-grid-cell-inner {
+    font-weight: 600 !important;
 }

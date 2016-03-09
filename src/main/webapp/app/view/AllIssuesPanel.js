@@ -41,6 +41,11 @@ Ext.define('PhenoDCC.view.AllIssuesPanel', {
     initComponent: function() {
         this.columns = [
             {
+                text: "Gene",
+                dataIndex: "geneSymbol",
+                flex: 1
+            },
+            {
                 text: "Priority",
                 dataIndex: "priority",
                 width: 60

@@ -552,7 +552,7 @@ click the <span class="button">_Add comment_</span> button. As soon as
 the comment is added, this will be displayed in the <span
 class="panel">_Actions_</span> panel.
 
-![Actions that are applicable to an issue][issue_actions]
+![Actions that are applicable to an issue][issue_actions_for_issues]
 
 To _accept_ an issue for further investigation, and to acknowledge that a
 fix is currently being worked on, fill in the comments, if any, and click
@@ -809,7 +809,7 @@ database][mysql], [Sencha ExtJS][extjs] framework,
 [issue_details]: images/issue_details.png "Raising an issue"
 [issue_actions]: images/issue_actions.png "Browsing list of issues and corresponding actions"
 [highlight_cited]: images/highlight_cited.png "Selecting issue updates actions and visualisation"
-[issue_actions]: images/issue_actions.png "Actions that are applicable to an issue"
+[actions_for_issues]: images/issue_actions.png "Actions that are applicable to an issue"
 [impress]: http://www.mousephenotype.org/impress "International Mouse Phenotyping Resource of Standardised Screens"
 [java]: http://www.oracle.com/technetwork/java/index.html "Java platform"
 [mysql]: http://www.mysql.com/ "MySQL database"

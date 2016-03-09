@@ -16,6 +16,7 @@
 package org.mousephenotype.dcc.qualitycontrol.webservice;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -39,6 +40,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.eclipse.persistence.exceptions.DatabaseException;
 import org.mousephenotype.dcc.entities.impress.Parameter;
 import org.mousephenotype.dcc.entities.impress.Procedure;
+import org.mousephenotype.dcc.entities.overviews.Genotype;
 import org.mousephenotype.dcc.entities.overviews.MeasurementsPerformed;
 import org.mousephenotype.dcc.entities.qc.AState;
 import org.mousephenotype.dcc.entities.qc.AUser;
@@ -224,6 +226,17 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
         return q;
     }
 
+    private Genotype getGenotype(Integer id, EntityManager em) {
+        Genotype g = null;
+        try {
+            g = em.find(Genotype.class, id);
+        } catch (Exception e) {
+            System.err.println("Unable to find genotype with id "
+                    + id + " in impress database.");
+        }
+        return g;
+    }
+
     private AnIssueResponse prepareIssueResponse(AnIssue issue) {
         AnIssueResponse r = null;
         EntityManager em = getEntityManager();
@@ -237,6 +250,7 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
             DataContext dc = issue.getContextId();
             Procedure p = getProcedure(dc.getPid(), em);
             Parameter q = getParameter(dc.getQid(), em);
+            Genotype g = getGenotype(dc.getGid(), em);
             AUser raisedBy = getUser(issue.getRaisedBy());
             AUser assignedTo = getUser(issue.getAssignedTo());
 
@@ -245,7 +259,9 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
                 System.err.println("Failed to retrieve issue details from database");
             } else {
                 r = new AnIssueResponse(
-                        issue.getId(), issue.getTitle(),
+                        issue.getId(),
+                        g.getGeneSymbol(),
+                        issue.getTitle(),
                         action.getDescription(), issue.getPriorityString(),
                         issue.getControlSetting(),
                         issue.getStatus().getShortName(),
@@ -304,6 +320,7 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
         Root<AnIssue> i = cq.from(AnIssue.class);
         Root<Procedure> pq = cq.from(Procedure.class);
         Root<Parameter> qq = cq.from(Parameter.class);
+        Root<Genotype> gq = cq.from(Genotype.class);
 
         Predicate p = cb.equal(dc.get(CID), cid);
         if (lid != null && lid != -1) {
@@ -325,6 +342,7 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
         p = cb.and(p, cb.equal(dc, i.get("contextId")));
         p = cb.and(p, cb.equal(dc.get(PID), pq.get("procedureId")));
         p = cb.and(p, cb.equal(dc.get(QID), qq.get("parameterId")));
+        p = cb.and(p, cb.equal(dc.get(GID), gq.get("genotypeId")));
 
         if (filter != 0x0) {
             if ((filter & INCLUDE_NODATA_ISSUES) == 0x0) {
@@ -354,6 +372,13 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
 
         if (orderBy != null && orderBy.length() > 0) {
             switch (orderBy) {
+                case "geneSymbol":
+                    if ("ASC".equals(orderDir)) {
+                        cq.orderBy(cb.asc(gq.get(orderBy)));
+                    } else {
+                        cq.orderBy(cb.desc(gq.get(orderBy)));
+                    }
+                    break;
                 case "procedure":
                     if ("ASC".equals(orderDir)) {
                         cq.orderBy(cb.asc(pq.get(NAME)));
@@ -496,6 +521,11 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
             p.setDataSet(null, 0L);
             List<AnIssue> issues;
 
+            /* none of the issue types are specified for inclusion */
+            if (filter == 0x0) {
+                return p;
+            }
+
             if (cid == null || cid == -1) {
                 issues = super.findAll();
             } else {
@@ -553,6 +583,9 @@ public class AnIssueFacadeREST extends AbstractFacade<AnIssue> {
             if (issues == null || issues.isEmpty()) {
                 p.setDataSet(null, 0L);
             } else {
+                /* this will make resolved issues appear at the bottom */
+                Collections.sort(issues);
+
                 Iterator<AnIssue> i = issues.iterator();
                 ArrayList<AnIssueResponse> t = new ArrayList<>();
                 while (i.hasNext()) {

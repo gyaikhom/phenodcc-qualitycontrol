@@ -15,16 +15,13 @@
  */
 package org.mousephenotype.dcc.qualitycontrol.webservice;
 
-import org.mousephenotype.dcc.qualitycontrol.webservice.pack.FertilityPack;
-import java.util.ArrayList;
-import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import org.mousephenotype.dcc.qualitycontrol.entities.FertilityData;
 import org.mousephenotype.dcc.qualitycontrol.entities.KeyValueRecord;
+import org.mousephenotype.dcc.qualitycontrol.webservice.pack.FertilityPack;
 
 /**
  * Web service for retrieving fertility for a given genotype and parameter.
@@ -33,10 +30,10 @@ import org.mousephenotype.dcc.qualitycontrol.entities.KeyValueRecord;
  */
 @Stateless
 @Path("fertility")
-public class FertilityFacadeREST extends AbstractFacade<FertilityData> {
+public class FertilityFacadeREST extends AbstractFacade<KeyValueRecord> {
 
     public FertilityFacadeREST() {
-        super(FertilityData.class);
+        super(KeyValueRecord.class);
     }
 
     @GET
@@ -58,19 +55,19 @@ public class FertilityFacadeREST extends AbstractFacade<FertilityData> {
                 p.setDataSet(null, 0L);
             } else {
                 EntityManager em = getEntityManager();
+                try {
                 TypedQuery<KeyValueRecord> q = em.createQuery(
-                        "SELECT DISTINCT new org.mousephenotype.dcc.qualitycontrol.entities.KeyValueRecord(q.parameterId, sp.value) FROM Centreprocedure as cp left join ACentre as ct on (ct.shortName = cp.centreid) left join Line as l on (l.lineCentreprocedureHjid = cp) left join Genotype as g on (g.genotype = l.colonyid) left join ProcedureFromRaw as p on (p = l.procedureLineHjid) left join Simpleparameter as sp on (sp.simpleparameterProcedureH0 = p) left join Context as c on (c.subject = p.hjid) left join Parameter as q on (q.parameterKey = sp.parameterid) left join Pipeline as pl on (pl.pipelineKey = cp.pipeline) WHERE ct.centreId = :centreId AND pl.pipelineId = :pipelineId AND g.genotypeId = :genotypeId AND g.strainId = :strainId AND p.procedureid = :procedureKey AND sp.parameterid like :procedureFrag AND c.isValid = 1 AND c.isActive = 1", KeyValueRecord.class);
+                        "SELECT DISTINCT new org.mousephenotype.dcc.qualitycontrol.entities.KeyValueRecord(q.parameterKey, q.name, sp.value) FROM Centreprocedure as cp left join ACentre as ct on (ct.shortName = cp.centreid) left join Line as l on (l.lineCentreprocedureHjid = cp) left join Genotype as g on (g.genotype = l.colonyid) left join ProcedureFromRaw as p on (p = l.procedureLineHjid) left join Simpleparameter as sp on (sp.simpleparameterProcedureH0 = p) left join Context as c on (c.subject = p.hjid) left join Parameter as q on (q.parameterKey = sp.parameterid) left join Pipeline as pl on (pl.pipelineKey = cp.pipeline) WHERE ct.centreId = :centreId AND pl.pipelineId = :pipelineId AND g.genotypeId = :genotypeId AND g.strainId = :strainId AND p.procedureid = :procedureKey AND sp.parameterid like :procedureFrag AND c.isValid = 1 AND c.isActive = 1 ORDER BY q.parameterKey", KeyValueRecord.class);
                 q.setParameter("centreId", centreId);
                 q.setParameter("pipelineId", pipelineId);
                 q.setParameter("genotypeId", genotypeId);
                 q.setParameter("strainId", strainId);
                 q.setParameter("procedureKey", procedureKey);
                 q.setParameter("procedureFrag", "%_FER_%");
-                List<KeyValueRecord> r = q.getResultList();
-                List<FertilityData> f;
-                f = new ArrayList<>();
-                f.add(new FertilityData(r));
-                p.setDataSet(f);
+                p.setDataSet(q.getResultList());
+                } catch(Exception e) {
+                    System.err.println(e.getMessage());
+                }
                 em.close();
             }
         } else {

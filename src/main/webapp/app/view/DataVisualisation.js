@@ -27,7 +27,7 @@ Ext.define('PhenoDCC.view.DataVisualisation', {
     ],
     layout: 'fit',
     border: 0,
-    initComponent: function() {
+    initComponent: function () {
         this.items =
             {
                 xtype: 'container',
@@ -79,7 +79,7 @@ Ext.define('PhenoDCC.view.DataVisualisation', {
                                             xtype: 'container',
                                             layout: 'border',
                                             border: 0,
-                                            width: 500,
+                                            width: 700,
                                             height: 40,
                                             style: 'padding: 10px;',
                                             items: [
@@ -87,7 +87,8 @@ Ext.define('PhenoDCC.view.DataVisualisation', {
                                                     xtype: 'textfield',
                                                     id: 'specimen-search-field',
                                                     fieldLabel: 'Search specimen',
-                                                    region: 'center',
+                                                    region: 'west',
+                                                    width: 400,
                                                     listeners: {
                                                         change: function (field, newValue, oldValue, eOpts) {
                                                             dcc.specimenNameQuery = newValue;
@@ -98,12 +99,33 @@ Ext.define('PhenoDCC.view.DataVisualisation', {
                                                 {
                                                     xtype: 'button',
                                                     text: 'Clear',
-                                                    region: 'east',
+                                                    region: 'center',
                                                     style: 'margin-left: 10px;',
                                                     handler: function () {
                                                         dcc.specimenNameQuery = '';
                                                         this.up('form').getForm().reset();
                                                     }
+                                                },
+                                                {
+                                                    xtype: 'checkboxgroup',
+                                                    layout: 'hbox',
+                                                    region: 'east',
+                                                    listeners: {
+                                                        change: function (field, newValue, oldValue, eOpts) {
+                                                            dcc.showUniqueSpecimens = newValue['show-unique-specimens'];
+                                                            dcc.extjs.controller.showUniqueSpecimens();
+                                                        }
+                                                    },
+                                                    items: [
+                                                        {
+                                                            boxLabel: 'Show unique specimens only',
+                                                            name: 'show-unique-specimens',
+                                                            inputValue: true,
+                                                            checked: false,
+                                                            id: 'show-unique-specimens',
+                                                            style: 'margin-left: 5px'
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }

@@ -24,8 +24,8 @@ limitations under the License.
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600' rel='stylesheet' type='text/css'>
-        <!-- after updating image viewer, don't forget to change the follow -->
-        <link rel="stylesheet" type="text/css" href="/imageviewer/css/imageviewer.0.7.css">
+        <!-- after updating image viewer, don't forget to change the following -->
+        <link rel="stylesheet" type="text/css" href="/imageviewer/css/imageviewer.0.7.2.css">
         <link rel="stylesheet" type="text/css" href="resources/css/phenodcc.DCC_QC_VERSION.css">
     </head>
     <body>
@@ -42,14 +42,25 @@ limitations under the License.
             req.setRequestHeader("Content-Type", "application/json; charset=utf-8");
             req.send(null);
             var records = JSON.parse(req.responseText);
+            function isQualityControlUser(roles) {
+                var i, c = roles.length;
+                for (i = 0; i < c; ++i)
+                    if ('qc user' === roles[i])
+                        return true;
+                return false;
+            }
             if (records.uid === 0)
                 window.location = "../user/login?destination=/qc";
             else {
-                /* this is the global variable where
-                 * we expose the public interfaces */
-                if (typeof dcc === 'undefined')
-                    dcc = {};
-                dcc.roles = records;
+                if (isQualityControlUser(records.roles)) {
+                    /* this is the global variable where
+                     * we expose the public interfaces */
+                    if (typeof dcc === 'undefined')
+                        dcc = {};
+                    dcc.roles = records;
+                } else {
+                    window.location = "noaccess.html";
+                }
             }
         </script>
 
@@ -59,8 +70,8 @@ limitations under the License.
         </div>
 
         <script type="text/javascript" src="app.DCC_QC_VERSION.js"></script>
-        <!-- after updating image viewer, don't forget to change the follow -->
-        <script type="text/javascript" src="/imageviewer/js/app.0.7.js"></script>
+        <!-- after updating image viewer, don't forget to change the following -->
+        <script type="text/javascript" src="/imageviewer/js/app.0.7.2.js"></script>
         <script>
             Ext.onReady(function() {
                 dcc.dataContext = {

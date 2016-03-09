@@ -16,7 +16,6 @@
 package org.mousephenotype.dcc.qualitycontrol.entities;
 
 import java.io.Serializable;
-import javax.persistence.Entity;
 import javax.persistence.Id;
 import org.mousephenotype.dcc.entities.qc.DataContext;
 
@@ -24,12 +23,12 @@ import org.mousephenotype.dcc.entities.qc.DataContext;
  *
  * @author Gagarine Yaikhom <g.yaikhom@har.mrc.ac.uk>
  */
-@Entity
 public class AnIssueResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     private Long id;
+    private String geneSymbol;
     private String priority;
     private Integer controlSetting;
     private String status;
@@ -48,12 +47,13 @@ public class AnIssueResponse implements Serializable {
     public AnIssueResponse() {
     }
 
-    public AnIssueResponse(Long id, String title, String description,
-            String priority, Integer controlSetting, String status,
-            String raisedBy, Integer raisedByUid, String assignedTo,
-            Long lastUpdate, DataContext context, String peid, String procedure,
-            String qeid, String parameter) {
+    public AnIssueResponse(Long id, String geneSymbol, String title,
+            String description, String priority, Integer controlSetting,
+            String status, String raisedBy, Integer raisedByUid,
+            String assignedTo, Long lastUpdate, DataContext context,
+            String peid, String procedure, String qeid, String parameter) {
         this.id = id;
+        this.geneSymbol = geneSymbol;
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -76,6 +76,14 @@ public class AnIssueResponse implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getGeneSymbol() {
+        return geneSymbol;
+    }
+
+    public void setGeneSymbol(String geneSymbol) {
+        this.geneSymbol = geneSymbol;
     }
 
     public String getTitle() {

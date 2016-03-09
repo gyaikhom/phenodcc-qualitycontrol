@@ -1080,6 +1080,22 @@ Ext.define('PhenoDCC.controller.QualityControl', {
             }
         }
     },
+    /* Filters procedure specimens to only display unique specimens. */
+    showUniqueSpecimens: function (handler) {
+        var me = this, store = me.getProcedureSpecimensStore(), proxy;
+        if (store !== null) {
+            proxy = store.getProxy();
+            if (proxy !== null) {
+                if (dcc.showUniqueSpecimens) {
+                    proxy.extraParams.unique = true;
+                } else {
+                    delete proxy.extraParams.unique;
+                }
+                Ext.getCmp('procedure-specimens-pager').moveFirst();
+                me.loadProcedureSpecimens(handler);
+            }
+        }
+    },
     /**
      * Function loadProcedureSpecimen() loads all of the specimens on
      * which the procedure specified in the data context was applied. The
@@ -1445,8 +1461,9 @@ Ext.define('PhenoDCC.controller.QualityControl', {
     showBookmark: function () {
         var bookmark = location.protocol + '//'
             + location.host
+            + '/user/login?destination='
             + location.pathname
-            + '?' + this.stateToString(),
+            + '?' + encodeURIComponent(this.stateToString()),
             win = window.open("", "Bookmark for PhenoDCC QC System State", "width=700,height=100");
         win.document.body.innerHTML = '<div style="font-family:Arial;font-size:14px;">'
             + '<p>Please use the following link to cite the current state of the QC system:</p>'
@@ -1457,7 +1474,7 @@ Ext.define('PhenoDCC.controller.QualityControl', {
      * Checks if the roles contains 'qc user' in it. Not very efficient,
      * but we can live with it. A bit map would be better.
      *
-     * @param [String] roles An array of roles.
+     * @param roles [String] An array of roles.
      */
     isQualityControlUser: function (roles) {
         var i, c = roles.length;

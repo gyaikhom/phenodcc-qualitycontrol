@@ -15,6 +15,12 @@
  */
 package org.mousephenotype.dcc.qualitycontrol.webservice;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -125,9 +131,10 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
             @QueryParam("start") Integer start,
             @QueryParam("limit") Integer limit,
             @QueryParam("n") String specimenNameQuery,
-            @QueryParam("a") String specimenIdQuery,
+            @QueryParam("a") BigInteger specimenIdQuery,
             @QueryParam("s") String sessionId,
-            @QueryParam("u") Integer userId) {
+            @QueryParam("u") Integer userId,
+            @QueryParam("unique") Boolean uniqueSpecimens) {
         ProcedureSpecimenPack t = new ProcedureSpecimenPack();
         if (!isValidSession(sessionId, userId)) {
             t.setSuccess(false);
@@ -140,6 +147,9 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
             // by default, sort in reverse chronological order
             String orderBy = "startDate";
             String direction = "DESC";
+            if (uniqueSpecimens == null) {
+                uniqueSpecimens = false;
+            }
 
             // check sorting request from client
             if (sort != null) {
@@ -153,114 +163,73 @@ public class ProcedureSpecimenFacadeREST extends AbstractFacade<ProcedureSpecime
                 }
             }
 
-            // we shall use criteria queries instead of named query because
-            // there are several client requested specification that could
-            // affect the query.
             EntityManager em = getEntityManager();
-            CriteriaBuilder cb = em.getCriteriaBuilder();
+            StringBuilder condition = new StringBuilder("from ProcedureAnimalOverview pao, AnimalOverview ao, Pipeline l WHERE pao.animalId = ao.animalId AND pao.pipeline = l.pipelineKey AND pao.centreId = :cid AND l.pipelineId = :lid AND pao.genotypeId = :gid AND pao.strainId = :sid AND pao.procedureId = :peid");
 
-            // we are going to extract procedure-specimen information that
-            // matches the data context defined by the centre, genotype,
-            // background strain and procedure.
-            CriteriaQuery<ProcedureSpecimen> cq = cb.createQuery(ProcedureSpecimen.class);
-
-            // this creates a base query that will bring all of the records
-            // in the procedure_animal_overview table. This is quivalent to
-            // JPQL "... FROM ProcedureAnimalOverview pao ..."
-            Root<ProcedureAnimalOverview> pao = cq.from(ProcedureAnimalOverview.class);
-            // this extends the base query above to also include data from the
-            // animal_overview table. This is equivalent to the JPQL
-            // "... FROM ProcedureAnimalOverview pao, AnimalOverview ao ..."
-            //
-            // Note that this extends the existing root 'pao'. Ideally, we
-            // should have chosen a join; however, the current database
-            // schema does not link the two tables procedure_animal_overview
-            // and animal_overview using a foreign key.
-            Root<AnimalOverview> ao = cq.from(AnimalOverview.class);
-
-            // what is the matching criteria?
-            Pipeline pipeline = em.find(Pipeline.class, lid);
-            Predicate p = cb.and(cb.equal(pao.get("centreId"), cid),
-                    cb.equal(pao.get("pipeline"), pipeline.getPipelineKey()),
-                    cb.equal(pao.get("genotypeId"), gid),
-                    cb.equal(pao.get("strainId"), sid),
-                    cb.equal(pao.get("procedureId"), peid));
-
-            // next, we should select only the records that are visible
-            // in the specified window (which is when paging is used).
-            // Note here that since we are not using a join, we have to
-            // add an additional criteria to match the two tables.
-            p = cb.and(cb.equal(pao.get("animalId"), ao.get("animalId")), p);
-
-            // Search for specimen by id
             if (specimenIdQuery != null) {
-                p = cb.and(cb.equal(pao.get("animalId"), specimenIdQuery), p);
+                condition.append(" AND pao.animalId = :aid");
             } else {
                 if (specimenNameQuery != null) {
-                    // Search for specimen by name
-                    p = cb.and(cb.like(pao.<String>get("animalName"),
-                            "%" + specimenNameQuery + "%"), p);
+                    specimenNameQuery = '%' + specimenNameQuery + '%';
+                    condition.append(" AND pao.animalName like :aname");
                 }
             }
-            cq.where(p);
 
-            // first we need the count of the number of records that match
-            // the data context criteria. This is the totaal number of
-            // records available, not just the selection that we will return.
-            CriteriaQuery<Long> cq1 = cb.createQuery(Long.class);
-            cq1.where(p);
-            cq1.select(cb.count(pao));
-            TypedQuery<Long> count = em.createQuery(cq1);
-            Long total = count.getSingleResult().longValue();
+            TypedQuery<Long> qCount = em.createQuery(
+                    "SELECT count(" + (uniqueSpecimens ? "distinct" : "")
+                    + " pao.animalId) " + condition.toString(), Long.class);
+            if (specimenIdQuery != null) {
+                qCount.setParameter("aid", specimenIdQuery);
+            } else {
+                if (specimenNameQuery != null) {
+                    qCount.setParameter("aname", specimenNameQuery);
+                }
+            }
+            qCount.setParameter("cid", cid);
+            qCount.setParameter("lid", lid);
+            qCount.setParameter("gid", gid);
+            qCount.setParameter("sid", sid);
+            qCount.setParameter("peid", peid);
+            qCount.setMaxResults(1);
+            Long total = qCount.getSingleResult();
+
+            String selectQuery;
+            if (uniqueSpecimens) {
+                selectQuery = "SELECT new org.mousephenotype.dcc.qualitycontrol.entities.ProcedureSpecimen(ao.animalId, pao.procedureOccurrenceId, ao.animalName, ao.cohortName, pao.sex, pao.zygosity, ao.dob, ao.litter, pao.pipeline, pao.experimenter, MIN(pao.startDate), pao.equipmentname, pao.equipmentmodel, pao.equipmentmanufacturer)";
+                condition.append(" GROUP BY pao.animalId");
+            } else {
+                selectQuery = "SELECT new org.mousephenotype.dcc.qualitycontrol.entities.ProcedureSpecimen(ao.animalId, pao.procedureOccurrenceId, ao.animalName, ao.cohortName, pao.sex, pao.zygosity, ao.dob, ao.litter, pao.pipeline, pao.experimenter, pao.startDate, pao.equipmentname, pao.equipmentmodel, pao.equipmentmanufacturer)";
+            }
 
             // how should we order the records?
             // Note that we have to ensure that we are choosing the correct
             // table and column to do the sorting.
             OrderbyAndEntity soe = decode(orderBy);
+            condition.append(" ORDER BY ");
+            condition.append(soe.usePao ? "pao." : "ao.");
+            condition.append(soe.orderBy);
+            condition.append(" ");
+            condition.append(direction);
 
-            // which direction to sort?
-            if ("ASC".equals(direction)) {
-                if (soe.usePao) {
-                    cq.orderBy(cb.asc(pao.get(soe.orderBy)));
-                } else {
-                    cq.orderBy(cb.asc(ao.get(soe.orderBy)));
-                }
+            TypedQuery<ProcedureSpecimen> q = em.createQuery(selectQuery + condition.toString(), ProcedureSpecimen.class);
+            if (specimenIdQuery != null) {
+                q.setParameter("aid", specimenIdQuery);
             } else {
-                if (soe.usePao) {
-                    cq.orderBy(cb.desc(pao.get(soe.orderBy)));
-                } else {
-                    cq.orderBy(cb.desc(ao.get(soe.orderBy)));
+                if (specimenNameQuery != null) {
+                    q.setParameter("aname", specimenNameQuery);
                 }
             }
-            // we do not require all of the fields from both tables. We only
-            // require a selection of fields from both tables. Make a selection
-            // as required by the procedure-specimen entity. This is the record
-            // that will be returned as a JSON response.
-            CompoundSelection<ProcedureSpecimen> ps
-                    = cb.construct(ProcedureSpecimen.class,
-                            ao.get("animalId"), pao.get("procedureOccurrenceId"),
-                            ao.get("animalName"), ao.get("cohortName"), pao.get("sex"),
-                            pao.get("zygosity"), ao.get("dob"), ao.get("litter"),
-                            pao.get("pipeline"), pao.get("experimenter"),
-                            pao.get("startDate"), pao.get("equipmentname"),
-                            pao.get("equipmentmodel"),
-                            pao.get("equipmentmanufacturer"));
-
-            cq.select(ps);
-            TypedQuery<ProcedureSpecimen> query = em.createQuery(cq);
-            // we do not want all of the available records. We only require
-            // a selection of the records that are visible inside the page.
-            if (start
-                    != null) {
-                query.setFirstResult(start);
-            }
-            if (limit
-                    != null) {
-                query.setMaxResults(limit);
-            }
+            q.setParameter("cid", cid);
+            q.setParameter("lid", lid);
+            q.setParameter("gid", gid);
+            q.setParameter("sid", sid);
+            q.setParameter("peid", peid);
+            q.setFirstResult(start);
+            q.setMaxResults(limit);
+            List<ProcedureSpecimen> result = q.getResultList();
 
             // all done, return the JSON response
-            t.setDataSet(query.getResultList(), total);
+            t.setDataSet(result, total);
             em.close();
         }
         return t;

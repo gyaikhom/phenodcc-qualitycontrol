@@ -24,14 +24,25 @@
             req.setRequestHeader("Content-Type", "application/json; charset=utf-8");
             req.send(null);
             var records = JSON.parse(req.responseText);
+            function isQualityControlUser(roles) {
+                var i, c = roles.length;
+                for (i = 0; i < c; ++i)
+                    if ('qc user' === roles[i])
+                        return true;
+                return false;
+            }
             if (records.uid === 0)
                 window.location = "../user/login?destination=/qc";
             else {
-                /* this is the global variable where
-                 * we expose the public interfaces */
-                if (typeof dcc === 'undefined')
-                    dcc = {};
-                dcc.roles = records;
+                if (isQualityControlUser(records.roles)) {
+                    /* this is the global variable where
+                     * we expose the public interfaces */
+                    if (typeof dcc === 'undefined')
+                        dcc = {};
+                    dcc.roles = records;
+                } else {
+                    window.location = "noaccess.html";
+                }
             }
         </script>
 
@@ -47,7 +58,7 @@
         <script type="text/javascript" src="app.js"></script>
 
         <script>
-            Ext.onReady(function() {
+            Ext.onReady(function () {
                 /**
                  * The data context sets the context on which to carry out the quality
                  * control of the measurements. It is defined by the centre which conducted
@@ -79,16 +90,24 @@
                     qeid: '<%= request.getParameter("qeid")%>', /* EMPReSS parameter Id */
                     aid: parseInt('<%= request.getParameter("aid")%>') /* animal Id */
                 };
-                if (isNaN(dcc.dataContext.cid)) dcc.dataContext.cid = -1;
-                if (isNaN(dcc.dataContext.gid)) dcc.dataContext.gid = -1;
-                if (isNaN(dcc.dataContext.sid)) dcc.dataContext.sid = -1;
-                if (isNaN(dcc.dataContext.lid)) dcc.dataContext.lid = -1;
-                if (isNaN(dcc.dataContext.pid)) dcc.dataContext.pid = -1;
-                if (isNaN(dcc.dataContext.qid)) dcc.dataContext.qid = -1;
-                if (isNaN(dcc.dataContext.aid)) dcc.dataContext.aid = -1;
+                if (isNaN(dcc.dataContext.cid))
+                    dcc.dataContext.cid = -1;
+                if (isNaN(dcc.dataContext.gid))
+                    dcc.dataContext.gid = -1;
+                if (isNaN(dcc.dataContext.sid))
+                    dcc.dataContext.sid = -1;
+                if (isNaN(dcc.dataContext.lid))
+                    dcc.dataContext.lid = -1;
+                if (isNaN(dcc.dataContext.pid))
+                    dcc.dataContext.pid = -1;
+                if (isNaN(dcc.dataContext.qid))
+                    dcc.dataContext.qid = -1;
+                if (isNaN(dcc.dataContext.aid))
+                    dcc.dataContext.aid = -1;
 
                 dcc.allissuesFilter = parseInt('<%= request.getParameter("if")%>');
-                if (isNaN(dcc.allissuesFilter))  dcc.allissuesFilter = 63;
+                if (isNaN(dcc.allissuesFilter))
+                    dcc.allissuesFilter = 63;
 
                 var ctrl = parseInt('<%= request.getParameter("ctrl")%>');
                 if (!isNaN(ctrl))

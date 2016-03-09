@@ -26,6 +26,9 @@ Ext.define('PhenoDCC.model.AllIssue', {
         type: 'int'
     },
     {
+        name: 'geneSymbol'
+    },
+    {
         name: 'title'
     },
     {

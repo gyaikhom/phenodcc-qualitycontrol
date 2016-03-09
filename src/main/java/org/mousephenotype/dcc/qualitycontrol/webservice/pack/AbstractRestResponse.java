@@ -28,6 +28,7 @@ public abstract class AbstractRestResponse<T> {
 
     private boolean success = false;
     private long total = 0L; /* if negative, gives error code */
+    private String message;
     private List<T> dataSet = null;
 
     public AbstractRestResponse() {
@@ -41,7 +42,7 @@ public abstract class AbstractRestResponse<T> {
         this.dataSet = dataSet;
         if (dataSet == null || dataSet.isEmpty()) {
             this.success = false;
-            this.dataSet = new ArrayList<T>();
+            this.dataSet = new ArrayList<>();
         } else {
             this.success = true;
             this.total = dataSet.size();
@@ -52,7 +53,7 @@ public abstract class AbstractRestResponse<T> {
         this.dataSet = dataSet;
         if (dataSet == null || dataSet.isEmpty()) {
             this.success = false;
-            this.dataSet = new ArrayList<T>();
+            this.dataSet = new ArrayList<>();
         } else {
             this.success = true;
             this.total = total;
@@ -79,4 +80,13 @@ public abstract class AbstractRestResponse<T> {
         this.success = false;
         this.total = -401;
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
 }

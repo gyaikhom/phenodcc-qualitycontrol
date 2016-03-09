@@ -105,22 +105,6 @@ Ext.define('PhenoDCC.view.Viewport', {
                                                 },
                                                 items: [
                                                     {
-                                                        boxLabel: 'New',
-                                                        name: 'new',
-                                                        inputValue: 0x1,
-                                                        checked: true,
-                                                        id: 'issue-filter-new',
-                                                        style: 'margin-left: 20px'
-                                                    },
-                                                    {
-                                                        boxLabel: 'Accepted',
-                                                        name: 'accepted',
-                                                        inputValue: 0x2,
-                                                        checked: true,
-                                                        id: 'issue-filter-accepted',
-                                                        style: 'margin-left: 20px'
-                                                    },
-                                                    {
                                                         boxLabel: 'Resolved',
                                                         name: 'resolved',
                                                         inputValue: 0x4,
@@ -129,31 +113,15 @@ Ext.define('PhenoDCC.view.Viewport', {
                                                         style: 'margin-left: 20px'
                                                     },
                                                     {
-                                                        boxLabel: 'Data added',
-                                                        name: 'dataadded',
-                                                        inputValue: 0x8,
+                                                        boxLabel: 'Unresolved',
+                                                        name: 'unresolved',
+                                                        inputValue: 0x3B,
                                                         checked: true,
-                                                        id: 'issue-filter-dataadded',
+                                                        id: 'issue-filter-unresolved',
                                                         style: 'margin-left: 20px'
                                                     },
                                                     {
-                                                        boxLabel: 'Data removed',
-                                                        name: 'dataremoved',
-                                                        inputValue: 0x10,
-                                                        checked: true,
-                                                        id: 'issue-filter-dataremoved',
-                                                        style: 'margin-left: 20px'
-                                                    },
-                                                    {
-                                                        boxLabel: 'Data changed',
-                                                        name: 'datachanged',
-                                                        inputValue: 0x20,
-                                                        checked: true,
-                                                        id: 'issue-filter-datachanged',
-                                                        style: 'margin-left: 20px'
-                                                    },
-                                                    {
-                                                        boxLabel: 'No measurements',
+                                                        boxLabel: 'Without measurements',
                                                         name: 'nodata',
                                                         inputValue: 0x40,
                                                         id: 'issue-filter-nodata',

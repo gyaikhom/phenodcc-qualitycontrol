@@ -38,6 +38,9 @@
     /* object that handles image visualisation */
     dcc.imageViewer = null;
 
+    /* this disables existing media details from the previous context */
+    dcc.mediaContextForQC = null;
+
     /* the state Id comes from phenodcc_qc.data_context table */
     dcc.getStateIconName = function (record) {
         var stateId = record.get("stateId"), icon = stateToIconMap[stateId];
@@ -200,8 +203,9 @@
         'highlight': 0x200000, /* highlight selected specimen */
         'selected': 0x400000, /* show selected points only */
         'minmax': 0x800000, /* show QC min/max range */
-        'newdata': 0x1000000, /* highlight data added since last action */
-        'shapes': 0x2000000 /* use shapes to display data points */
+        'shapes': 0x2000000, /* use shapes to display data points */
+        /* deprecated */
+        'newdata': 0x0000000 /* 0x1000000: highlight data added since last action */
     };
 
     pieColours = [
@@ -2530,129 +2534,52 @@
     }
 
     /**
-     * Renders a the table that was usd to generate pie-charts.
-     *
-     * @param {Object} div Table container.
-     * @param {Object} data Contains data to show in table.
-     * @param {Array} headers Array of strings to use as headers.
-     * @param {Boolean} showColumnTotal True to show last row column-total.
-     * @param {Boolean} showRowTotal True to show last column row-total.
-     */
-    function renderPieTable(div, data, headers, showColumnTotal, showRowTotal) {
-        var table = div.append('table'), key, rowData, i, c, tr,
-            rowTotal, columnTotals, value;
-
-        tr = table.append('tr');
-        tr.append('td');
-        for (i = 0, c = headers.length; i < c; ++i)
-            tr.append('td').text(headers[i]);
-        if (showRowTotal)
-            tr.append('td').text('Total');
-
-        for (key in data) {
-            rowData = data[key];
-            tr = table.append('tr');
-            tr.append('td').text(key);
-            c = rowData.length;
-            rowTotal = 0;
-            if (columnTotals === undefined) {
-                columnTotals = [];
-                for (i = 0; i < c; ++i)
-                    columnTotals[i] = 0;
-            }
-            for (i = 0; i < c; ++i) {
-                value = rowData[i].v;
-                rowTotal += value;
-                columnTotals[i] += value;
-                tr.append('td').text(value);
-            }
-            if (showRowTotal)
-                tr.append('td').attr('class', 'row-total').text(rowTotal);
-        }
-        if (showColumnTotal) {
-            tr = table.append('tr');
-            tr.append('td').text('Total');
-            for (i = 0; i < c; ++i)
-                tr.append('td').attr('class', 'column-total').text(columnTotals[i]);
-            tr.append('td');
-        }
-    }
-
-    /**
-     * Process viability data.
-     *
-     * @param {Object} data Viability data object returned by server.
-     */
-    function processViabilityData(data) {
-        var data = data[0], groups = data.groups, key, field, group, sum, e, v;
-        for (key in groups) {
-            group = groups[key];
-            data.groups[key] = [];
-            sum = 0;
-            for (field in group) {
-                v = parseInt(group[field]);
-                if (isNaN(v)) {
-                    console.warn("Failed to parse value '" + group[field] + "'.");
-                    return null;
-                }
-
-                /* we do not use the supplied total: they are calculated */
-                if (field === 'total') {
-                    e = v;
-                } else {
-                    data.groups[key].push({
-                        'l': field,
-                        'v': v
-                    });
-                    sum += v;
-                }
-            }
-            if (sum !== e)
-                console.warn("Supplied total does not match sum for '" +
-                    key + "'.");
-        }
-        return data;
-    }
-
-    /**
-     * Plot viability.
-     *
+     * Display tabular data
+     * 
      * @param {Object} parent Container DOM node.
+     * @param {String} procedure Procedure to display.
+     * @param {Object} embryoStage Embryo stage if embryo data; otherwise, null.
      */
-    function plotViability(parent) {
+    function plotTabularData(parent, procedure, embryoStage) {
         parent.classed('loading', false);
-        var data = measurementsSet[ZYGOSITY_ALL];
+        var data = measurementsSet[ZYGOSITY_ALL],
+            key, d, tr, title, table, stage, header, container;
+
         if (data === null)
             return;
-        var tableHeight = 160, gapSize = 50, key, i = 0,
-            title = addDiv(parent, null, 'viability-title'),
-            pies = addDiv(parent, null, 'pie-charts'),
-            table = addDiv(parent, null, 'pie-table'),
-            containers, temp, gapText = '=', outcome = data.outcome;
 
-        height(pies, height(parent) - tableHeight);
-        height(table, tableHeight);
-        containers = getPiesContainer(pies, 3, 'h', true, 0.7, gapSize);
+        title = addDiv(parent, null, 'tabular-title');
+        stage = addDiv(parent, null, 'tabular-stage');
+        header = addDiv(parent, null, 'tabular-table-header');
+        container = addDiv(parent, null, 'tabular-table-container');
 
-        title.html('<span>Viability procedure</span><span>Combines multiple parameters</span>');
-        /* when using a parent-child pie charts grid, the first pie must be
-         * the parent pie */
-        data = data.groups;
+        title.html('<span>' +
+            (embryoStage ? 'Embryo ' : 'Adult ') + procedure +
+            ' procedure</span>' +
+            '<span>Combines multiple parameters</span>');
+        table = header.append('table');
+        tr = table.append('thead').append('tr');
+        tr.append('th').text("Parameter Key");
+        tr.append('th').text("Name");
+        tr.append('th').text("Value");
+
+        table = container.append('table');
+        table = table.append('tbody');
         for (key in data) {
-            renderPie(containers[i++], data[key], key);
-            temp = containers[i];
-            if (temp !== undefined) {
-                temp.append('text').text(gapText).attr('class', 'pie-gap-label')
-                    .attr('x', gapSize / 2)
-                    .attr('y', height(temp) / 2)
-                    .attr('dy', "-.25em");
-                gapText = '+';
-                i++;
-            }
+            d = data[key];
+            tr = table.append('tr').classed('odd', key % 2);
+            tr.append('td').text(d.key);
+            tr.append('td').text(d.name);
+            tr.append('td').text(d.value);
         }
-        addDiv(table).html('<b>Outcome:</b> ' + outcome);
-        renderPieTable(table, data, ['Wildtype', 'Heterozygote', 'Homozygote'],
-            false, true);
+
+        if (embryoStage)
+            stage.html('<span>Stage:</span><span>' + embryoStage.s + '</span>');
+
+        parent.refit = function () {
+            height(container, height(parent) - height(title) - height(stage));
+        };
+        parent.refit();
     }
 
     /**
@@ -2681,10 +2608,9 @@
             '&peid=' + peid,
             function (data) {
                 if (data && data.success) {
-                    measurementsSet[ZYGOSITY_ALL] =
-                        processViabilityData(data.viability);
+                    measurementsSet[ZYGOSITY_ALL] = data.viability;
                     if (measurementsSet[ZYGOSITY_ALL])
-                        plotViability(target);
+                        plotTabularData(target, "viability", null);
                     else
                         noMeasurementsToVisualise();
                 } else
@@ -2693,87 +2619,38 @@
     }
 
     /**
-     * Process fertility data.
-     *
-     * @param {Object} data Fertility data object returned by server.
+     * Retrieves embryo viability data from the server and displays them in the
+     * visualisation cluster. Calculations are cached for future
+     * references.
+     * 
+     * @param {Integr} id Visualisation identifier.
+     * @param {Object} target Visualisation container DOM node.
+     * @param {Integer} gid Genotype identifier.
+     * @param {Integer} sid Srain identifier.
+     * @param {Integer} cid Centre identifier.
+     * @param {String} qeid Parameter key.
+     * @param {Object} embryoStage Embryo stage object; otherwise, null.
      */
-    function processFertilityData(data) {
-        var data = data[0];
-        if (data.grossFindingsMale === null ||
-            data.grossFindingsFemale === null) {
-            console.warn("Server return invalid fertility measurements");
-            data = null;
-        }
-        return data;
-    }
-
-    /**
-     * Rnders fertility table.
-     *
-     * @param {Object} target Table target.
-     * @param {Object} data Fertility data.
-     */
-    function renderFertilityTable(target, data) {
-        var table, tr, primary, male, female;
-
-        target.append('br');
-        addDiv(target).html('<b>Gross findings male:</b> ' + data.grossFindingsMale);
-        addDiv(target).html('<b>Gross findings female:</b> ' + data.grossFindingsFemale);
-        target.append('br');
-
-        table = target.append('table');
-        tr = table.append('tr');
-        primary = data['primary'];
-        male = data['male'];
-        female = data['female'];
-
-        tr.append('td');
-        tr.append('td').text('Primary');
-        tr.append('td').text('Male screen');
-        tr.append('td').text('Female screen');
-
-        tr = table.append('tr');
-        tr.append('td').text('Total matings');
-        tr.append('td').text(primary.matings === null ? '?' : primary.matings);
-        tr.append('td').text(male.matings === null ? '?' : male.matings);
-        tr.append('td').text(female.matings === null ? '?' : female.matings);
-
-        tr = table.append('tr');
-        tr.append('td').text('Total pups born');
-        tr.append('td').text(primary.born === null ? '?' : primary.born);
-        tr.append('td').text(male.born === null ? '?' : male.born);
-        tr.append('td').text(female.born === null ? '?' : female.born);
-
-        tr = table.append('tr');
-        tr.append('td').text('Total litters');
-        tr.append('td').text(primary.litters === null ? '?' : primary.litters);
-        tr.append('td').text(male.litters === null ? '?' : male.litters);
-        tr.append('td').text(female.litters === null ? '?' : female.litters);
-
-        tr = table.append('tr');
-        tr.append('td').text('Total embryos/pups with dissection');
-        tr.append('td').text(primary.dissectionEmbryos === null ? '?' : primary.dissectionEmbryos);
-        tr.append('td').text(male.dissectionEmbryos === null ? '?' : male.dissectionEmbryos);
-        tr.append('td').text(female.dissectionEmbryos === null ? '?' : female.dissectionEmbryos);
-    }
-
-    /**
-     * Plot fertility.
-     *
-     * @param {Object} parent Container DOM node.
-     */
-    function plotFertility(parent) {
-        parent.classed('loading', false);
-        var data = measurementsSet[ZYGOSITY_ALL];
-        if (data === null)
-            return;
-        var tableHeight = 150,
-            title = addDiv(parent, null, 'viability-title'),
-            table = addDiv(parent, null, 'pie-table')
-            .style('height', tableHeight + 'px');
-
-        title.html('<span>Fertility procedure</span><span>Combines multiple parameters</span>');
-        renderFertilityTable(table, data);
+    function retrieveAndVisualiseEmbryoViabilityData(id, target, gid, sid, cid, qeid, embryoStage) {
+        if (typeof retrieveViabilityRequest.abort === 'function')
+            retrieveViabilityRequest.abort();
+        retrieveViabilityRequest = d3.json('rest/embryo-viability?' +
+            'u=' + dcc.roles.uid +
+            '&s=' + dcc.roles.ssid +
+            '&cid=' + cid +
+            '&gid=' + gid +
+            '&sid=' + sid +
+            '&stage=' + embryoStage.k,
+            function (data) {
+                if (data && data.success) {
+                    measurementsSet[ZYGOSITY_ALL] = data.viability;
+                    if (measurementsSet[ZYGOSITY_ALL])
+                        plotTabularData(target, "viability", embryoStage);
+                    else
+                        noMeasurementsToVisualise();
+                } else
+                    noMeasurementsToVisualise();
+            });
     }
 
     /**
@@ -2802,10 +2679,9 @@
             '&peid=' + peid,
             function (data) {
                 if (data && data.success) {
-                    measurementsSet[ZYGOSITY_ALL] =
-                        processFertilityData(data.fertility);
+                    measurementsSet[ZYGOSITY_ALL] = data.fertility;
                     if (measurementsSet[ZYGOSITY_ALL])
-                        plotFertility(target);
+                        plotTabularData(target, "fertility", null);
                     else
                         noMeasurementsToVisualise();
                 } else
@@ -3132,6 +3008,31 @@
             });
     }
 
+    function getEmbryoStage(key) {
+        if (key.indexOf('_EVL_') !== -1)
+            return {
+                's': 'E9.5',
+                'k': 'EVL'
+            };
+        else if (key.indexOf('_EVM_') !== -1)
+            return {
+                's': 'E12.5',
+                'k': 'EVM'
+            };
+        else if (key.indexOf('_EVO_') !== -1)
+            return {
+                's': 'E14.5 - E15.5',
+                'k': 'EVO'
+            };
+        else if (key.indexOf('_EVP_') !== -1)
+            return {
+                's': 'E18.5',
+                'k': 'EVP'
+            };
+        else
+            return null;
+    }
+
     function plotParameter(id, target, gid, sid, cid, lid, peid, qeid) {
         var plotType = dcc.plotType, ctx = dcc.dataContext;
         target.attr('id', id);
@@ -3153,7 +3054,14 @@
                 dcc.imageViewer.clear();
                 dcc.imageViewer = null;
             }
-            if (qeid.indexOf('_VIA_') !== -1) {
+
+            var embryoStage = null;
+            if (qeid !== undefined)
+                embryoStage = getEmbryoStage(qeid);
+
+            if (embryoStage) {
+                retrieveAndVisualiseEmbryoViabilityData(id, target, gid, sid, cid, qeid, embryoStage);
+            } else if (qeid.indexOf('_VIA_') !== -1) {
                 retrieveAndVisualiseViabilityData(id, target, gid, sid, cid, lid, peid, qeid);
             } else if (qeid.indexOf('_FER_') !== -1) {
                 retrieveAndVisualiseFertilityData(id, target, gid, sid, cid, lid, peid, qeid);
@@ -3521,8 +3429,8 @@
     }
 
     function prepareMetadataGroups(mgs) {
-        if (!mgs || mgs.length === 0)
-            return null;
+        if (!mgs || mgs.length < 2)
+            return {};
 
         var diffSet = {}, keyValues = {}, i, c, key;
         for (key in mgs[0].v) {
@@ -5902,10 +5810,14 @@
             if (me.type === 'point' && me.isActiveCtrl('polyline')) {
                 mutantStatistics = getStatistics(me, true);
                 wildtypeStatistics = getStatistics(me, false);
-                if (wildtypeStatistics && me.isActiveCtrl('wildtype'))
-                    plotStatistics(me, wildtypeStatistics.overall.y, 10, true);
-                if (mutantStatistics !== null)
-                    plotStatistics(me, mutantStatistics.overall.y, 10, false);
+                if (me.gid === 0) {
+                    plotStatistics(me, mutantStatistics.overall.y, 10, true);
+                } else {
+                    if (wildtypeStatistics && me.isActiveCtrl('wildtype'))
+                        plotStatistics(me, wildtypeStatistics.overall.y, 10, true);
+                    if (mutantStatistics !== null)
+                        plotStatistics(me, mutantStatistics.overall.y, 10, false);
+                }
             }
         },
         quartiles: function () {
@@ -7208,6 +7120,9 @@
         selectedDatapoints.each(function (d) {
             selectedAnimals[d.a] = 1;
         });
+        /* if there were any media, include this */
+        if (dcc.mediaContextForQC !== null)
+            selectedAnimals[dcc.mediaContextForQC.aid] = 1;
 
         numberOfSelectedAnimals = 0;
         for (i in selectedAnimals) {
@@ -7292,6 +7207,8 @@
             .attr('class', 'form-input-text');
 
         c = selectedDatapoints.getCount();
+        if (c === 0 && dcc.mediaContextForQC !== null)
+            c = 1;
         label = 'Description: <span style="color:' +
             (c > 0 ? 'green' : 'red') + '">(' + c + ' datapoints selected';
         if (c > 0)
@@ -7416,17 +7333,19 @@
                 + '&s=' + dcc.roles.ssid
                 + '&ids=' + prepareSelectedAnimals(),
                 function (data) {
+                    var s = '',
+                        animalDetails = prepareAnimalDetails(data.specimens),
+                        measurementDetails = prepareMeasurementDetails();
                     if (data.success === true && data.total > 0) {
-                        var s = '',
-                            animalDetails = prepareAnimalDetails(data.specimens),
-                            measurementDetails = prepareMeasurementDetails();
                         if (animalDetails)
                             s = animalDetails;
                         if (measurementDetails)
                             s = s + "\n\n" + measurementDetails;
-                        showRaiseIssueDialog(dialog, s);
-                    } else
-                        showRaiseIssueDialog(dialog);
+                    } else {
+                        if (dcc.mediaContextForQC !== null)
+                            s = 'Animal name: ' + dcc.mediaContextForQC.an;
+                    }
+                    showRaiseIssueDialog(dialog, s);
                 });
     }
 

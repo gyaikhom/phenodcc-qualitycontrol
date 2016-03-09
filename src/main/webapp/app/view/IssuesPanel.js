@@ -26,36 +26,39 @@ Ext.define('PhenoDCC.view.IssuesPanel', {
     requires: [ 'PhenoDCC.store.Issues' ],
     store: 'Issues',
     viewConfig: {
-        enableTextSelection: true
+        enableTextSelection: true,
+        getRowClass: function(record, index, rowParams) {
+            var status = record.get('status');
+            return 'allissues-row-' + status;
+        }
     },
     initComponent: function() {
         this.columns = [
+        {
+            text: "Status",
+            dataIndex: "status",
+            width: 70,
+            sortable: true
+        },
         {
             text: "Title",
             dataIndex: "title",
             flex: 1
         },
         {
-            text: "Priority",
-            dataIndex: "priority",
-            width: 60,
-            sortable: true
-        },
-        {
-            text: "Status",
-            dataIndex: "status",
-            width: 60,
-            sortable: true
+            text: "Last update",
+            dataIndex: "lastUpdate"
         },
         {
             text: "Raised By",
             dataIndex: "raisedBy"
         },
         {
-            text: "Last update",
-            dataIndex: "lastUpdate"
+            text: "Priority",
+            dataIndex: "priority",
+            width: 60,
+            sortable: true
         }];
-
         this.callParent();
     }
 });

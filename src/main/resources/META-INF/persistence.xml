@@ -73,6 +73,15 @@
         <class>org.mousephenotype.dcc.crawler.entities.ZipLog</class>
         <class>org.mousephenotype.dcc.crawler.entities.CrawlingSession</class>
         <class>org.mousephenotype.dcc.crawler.entities.SessionTask</class>
+        
+        <!-- media entities -->
+        <class>org.mousephenotype.dcc.entities.media.FileExtension</class>
+        <class>org.mousephenotype.dcc.entities.media.MediaPhase</class>
+        <class>org.mousephenotype.dcc.entities.media.MediaFile</class>
+        <class>org.mousephenotype.dcc.entities.media.ErrorLogs</class>
+        <class>org.mousephenotype.dcc.entities.media.MediaStatus</class>
+        <class>org.mousephenotype.dcc.entities.media.Association</class>
+
         <!-- project entities -->
         <class>org.mousephenotype.dcc.qualitycontrol.entities.GeneStrain</class>
         <class>org.mousephenotype.dcc.qualitycontrol.entities.ProcedureSpecimen</class>
